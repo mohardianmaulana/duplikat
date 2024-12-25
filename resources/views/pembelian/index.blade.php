@@ -85,10 +85,18 @@
                                                 <i class="fas fa-info-circle"></i> Detail
                                             </button>
                                             @if (Auth::check() && Auth::user()->hasRole('admin'))
-                                            <a href='{{ url('pembelian/'.$item->id.'/edit') }}' class="btn btn-primary btn-sm">
-                                                <i class="fas fa-edit"></i>
-                                                Edit
-                                            </a>
+                                            @if ($item->status == 1)
+                                                <a href="{{ url('pembelian/'.$item->id.'/edit-barang-baru') }}" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                    Edit
+                                                </a>
+                                            @else
+                                                <a href="{{ url('pembelian/'.$item->id.'/edit') }}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                    Edit
+                                                </a>
+                                            @endif
+
                                             @endif
                                           </div>
                                       </td>

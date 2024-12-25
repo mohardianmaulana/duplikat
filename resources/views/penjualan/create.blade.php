@@ -425,7 +425,7 @@
                                 video: {
                                     facingMode: "environment",
                                     width: {
-                                        ideal: 1300
+                                        ideal: 1280
                                     },
                                     height: {
                                         ideal: 720

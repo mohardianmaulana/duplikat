@@ -132,6 +132,7 @@ class PembelianBarangBaruController extends Controller
         'supplier_id' => $request->supplier_id,
         'total_item' => $jumlah,
         'total_harga' => $totalHarga,
+        'status' => 1,
         'tanggal_transaksi' => now(),
         'user_id' => Auth::id(),
     ]);
@@ -141,6 +142,7 @@ class PembelianBarangBaruController extends Controller
         'jumlah' => $jumlah, 
         'harga' => $harga_beli, 
         'jumlah_itemporary' => $jumlah, 
+        'status' => 1,
     ]);
 
     // Perbarui stok barang

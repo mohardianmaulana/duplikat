@@ -89,6 +89,20 @@ class PembelianController extends Controller
         return view('pembelian.edit', $data);
     }
 
+    public function editBarangBaru($id)
+{
+    // Ambil data pembelian berdasarkan ID
+    $pembelian = Pembelian::findOrFail($id);
+    $barang = Barang::findOrFail($id);
+    $supplier = Supplier::all(); // Ambil data supplier
+    $kategori = Kategori::all(); // Ambil data kategori
+
+    // Mengirimkan data pembelian ke view
+    return view('pembelian.editBarangBaru', compact('pembelian', 'supplier', 'kategori','barang'));
+}
+
+
+
     public function update(Request $request, $id)
     {
         // Panggil method model untuk memperbarui pembelian

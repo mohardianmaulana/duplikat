@@ -95,6 +95,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/pembelian/create', [PembelianController::class, 'create'])->name('create')->middleware('can:crud');
     Route::post('/pembelian', [PembelianController::class, 'store'])->name('store')->middleware('can:crud');
     Route::get('/pembelian/{Pembelian}/edit', [PembelianController::class, 'edit'])->name('edit')->middleware('can:crud');
+    Route::get('/pembelian/{Pembelian}/edit-barang-baru', [PembelianController::class, 'editBarangBaru'])->name('editBarangBaru')->middleware('can:crud');
     Route::put('/pembelian/{Pembelian}', [PembelianController::class, 'update'])->name('update')->middleware('can:crud');
     Route::get('/pembelianBarang/create', [PembelianBarangBaruController::class, 'create'])->name('create')->middleware('can:crud');
     Route::post('/pembelianBarang', [PembelianBarangBaruController::class, 'store'])->name('store')->middleware('can:crud');

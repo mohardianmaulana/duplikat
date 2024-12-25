@@ -17,6 +17,7 @@ return new class extends Migration
             $table-> unsignedBigInteger('supplier_id');
             $table-> integer('total_item');
             $table-> integer('total_harga');
+            $table-> boolean('status');
             $table-> date('tanggal_transaksi');
             $table->timestamps();
 

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->integer('jumlah');
             $table->integer('jumlah_itemporary');
             $table->integer('harga');
+            $table->boolean('status');
             $table->timestamps();
 
             $table->foreign('barang_id')->references('id')->on('barang')->onDelete('cascade');

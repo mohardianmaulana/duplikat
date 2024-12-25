@@ -14,7 +14,7 @@ class Pembelian extends Model
 {
     use HasFactory;
     protected $table = 'pembelian';
-    protected $fillable = ['supplier_id', 'total_item', 'total_harga', 'tanggal_transaksi', 'user_id'];
+    protected $fillable = ['supplier_id', 'total_item', 'total_harga', 'tanggal_transaksi', 'status', 'user_id'];
 
     // Relasi ke model Barang
     public function barangs()
@@ -255,6 +255,7 @@ class Pembelian extends Model
             'total_item' => $totalItem,
             'total_harga' => $totalHarga,
             'tanggal_transaksi' => now(),
+            'status' => 0,
             'user_id' => Auth::id(),
         ]);
 
@@ -264,12 +265,59 @@ class Pembelian extends Model
                 'jumlah' => $data['jumlah'][$index],
                 'harga' => $data['harga_beli'][$index],
                 'jumlah_itemporary' => $data['jumlah'][$index],
+                'status' => 0,
             ]);
+
+            // Update jumlah barang di tabel barang
+            $barang = Barang::find($barang_id);
+            if ($barang) {
+                // Menambahkan jumlah yang dibeli ke jumlah stok barang
+                $barang->increment('jumlah', $data['jumlah'][$index]);
+            }
         }
 
         return $pembelian;
     }
 
+    public static function gantiBarangBaru($id)
+{
+    $pembelian = Pembelian::with(['barangs', 'supplier', 'user'])->find($id);
+
+    if (!$pembelian) {
+        return null;  // Jika pembelian tidak ditemukan
+    }
+
+    $tanggalTransaksi = Carbon::parse($pembelian->tanggal_transaksi);
+    $satuBulanLalu = Carbon::now()->subMonth();
+
+    // Periksa apakah pembelian lebih dari satu bulan
+    if ($tanggalTransaksi->lt($satuBulanLalu)) {
+        return ['error' => 'Penjualan lebih dari satu bulan tidak dapat diedit.'];
+    }
+
+    // Ambil harga beli rata-rata untuk semua barang
+    $avgHargaBeli = DB::table('harga_barang')
+        ->select('barang_id', DB::raw('ROUND(AVG(harga_beli)) as rata_rata_harga_beli'))
+        ->whereNull('tanggal_selesai')
+        ->groupBy('barang_id')
+        ->get();
+
+    $rataRataHargaBeli = [];
+    foreach ($avgHargaBeli as $avg) {
+        $rataRataHargaBeli[$avg->barang_id] = $avg->rata_rata_harga_beli;
+    }
+
+    // Ambil semua barang untuk dipilih pada tampilan edit
+    $barangs = Barang::all();
+
+    // Kembalikan semua data yang dibutuhkan untuk tampilan edit
+    return [
+        'pembelian' => $pembelian,
+        'rataRataHargaBeli' => $rataRataHargaBeli,
+        'barangs' => $barangs,
+        'tanggal_transaksi' => $pembelian->tanggal_transaksi->format('d-m-Y'),
+    ];
+}
     public static function ganti($id)
 {
     $pembelian = Pembelian::with(['barangs', 'supplier', 'user'])->find($id);
@@ -339,6 +387,7 @@ public static function gantiPembelian($data, $id)
         'total_item' => $totalItem,
         'total_harga' => $totalHarga,
         'tanggal_transaksi' => $pembelian->tanggal_transaksi,
+        'status' => 0,
         'user_id' => Auth::id(),
     ]);
 
@@ -362,6 +411,7 @@ public static function gantiPembelian($data, $id)
                 'jumlah' => $jumlah,
                 'harga' => $harga,
                 'jumlah_itemporary' => $jumlah, // Jika Anda butuh menyimpan sementara
+                'status' => 0,
             ]);
 
             // Logika untuk menyesuaikan jumlah barang
