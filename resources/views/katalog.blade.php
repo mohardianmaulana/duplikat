@@ -19,7 +19,7 @@
             height: 200px;
             object-fit: cover;
             border-radius: 10px 10px 0 0;
-            
+
         }
 
         .card-body {
@@ -79,42 +79,43 @@
 
                     <h1 class="h3 mb-4 text-gray-800">Katalog Barang</h1>
 
-                    <a href='{{ url('/') }}' class="btn btn-secondary btn-sm"> < Kembali</a>
+                    <a href='{{ url('/') }}' class="btn btn-secondary btn-sm">
+                        < Kembali</a>
 
-                    <!-- Dropdown untuk memilih kategori -->
-                    <form id="kategoriForm" action="{{ route('katalog') }}" method="GET">
-                        <div class="mb-4">
-                            <label for="kategori" class="form-label">Pilih Kategori</label>
-                            <select class="form-select" id="kategori" name="kategori_id" onchange="this.form.submit()">
-                                <option value="">Semua Kategori</option>
-                                @foreach($kategori as $kategori)
-                                    <option value="{{ $kategori->id }}" {{ request('kategori_id') == $kategori->id ? 'selected' : '' }}>{{ $kategori->nama_kategori }}</option>
+                            <!-- Dropdown untuk memilih kategori -->
+                            <form id="kategoriForm" action="{{ route('katalog') }}" method="GET">
+                                <div class="mb-4">
+                                    <label for="kategori" class="form-label">Pilih Kategori</label>
+                                    <select class="form-select" id="kategori" name="kategori_id" onchange="this.form.submit()">
+                                        <option value="">Semua Kategori</option>
+                                        @foreach($kategori as $kategori)
+                                        <option value="{{ $kategori->id }}" {{ request('kategori_id') == $kategori->id ? 'selected' : '' }}>{{ $kategori->nama_kategori }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </form>
+
+                            <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+                                @foreach ($barang as $item)
+                                <div class="col">
+                                    <div class="card">
+                                        <img src="{{ asset('img/' . ($item->gambar ?: $item->kategori_gambar)) }}"
+                                            class="card-img-top"
+                                            alt="{{ $item->nama }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ $item->nama }}</h5>
+                                            <p class="card-text">{{ $item->kategori_nama }}</p>
+                                            <p class="price">Rp. {{ number_format($item->harga_jual, 0, ',', '.') }}</p>
+                                            <p class="card-text">Stok: {{ $item->jumlah }}</p>
+
+                                            <a href="#modalCreate" data-toggle="modal" onclick="$('#modalCreate #formCreate').attr('action', '{{ url('penjualan/create') }}')" class="btn btn-primary btn-sm mr-2">
+                                                <i class="fas fa-shopping-cart"></i> Add To Cart
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                                 @endforeach
-                            </select>
-                        </div>
-                    </form>
-
-                    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-                        @foreach ($barang as $item)
-    <div class="col">
-        <div class="card">
-            <img src="{{ asset('img/' . ($item->gambar ?: $item->kategori_gambar)) }}" 
-                 class="card-img-top" 
-                 alt="{{ $item->nama }}">
-            <div class="card-body">
-                <h5 class="card-title">{{ $item->nama }}</h5>
-                <p class="card-text">{{ $item->kategori_nama }}</p>
-                <p class="price">Rp. {{ number_format($item->harga_jual, 0, ',', '.') }}</p>
-                <p class="card-text">Stok: {{ $item->jumlah }}</p>
-
-                <a href="#modalCreate" data-toggle="modal" onclick="$('#modalCreate #formCreate').attr('action', '{{ url('penjualan/create') }}')" class="btn btn-primary btn-sm mr-2">
-                    <i class="fas fa-shopping-cart"></i> Add To Cart
-                </a>
-            </div>
-        </div>
-    </div>
-@endforeach
-                    </div>
+                            </div>
 
                 </div>
                 <!-- /.container-fluid -->
@@ -144,7 +145,7 @@
 
     <script>
         $(document).ready(function() {
-            
+
         });
     </script>
 

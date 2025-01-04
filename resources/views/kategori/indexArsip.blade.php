@@ -32,18 +32,18 @@
 
                     <div class="my-3 p-3 bg-body shadow-sm" style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
                         @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                         @endif
                         @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
                         @endif
                         <table id="myTable" class="table table-striped">
                             <thead>
@@ -77,7 +77,7 @@
 
                 </div>
                 <!-- /.container-fluid -->
-                
+
             </div>
             <!-- End of Main Content -->
 
@@ -124,10 +124,10 @@
     </div>
 
     <script>
-        $('#modalPulihkan').on('show.bs.modal', function (event) {
+        $('#modalPulihkan').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget);
             var id = button.data('id');
-            var action = '{{ url('kategori/pulihkan') }}/' + id;
+            var action = '{{ url("/kategori/pulihkan/") }}/' + id;
             var modal = $(this);
             modal.find('#formPulihkan').attr('action', action);
         });

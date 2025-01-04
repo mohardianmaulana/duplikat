@@ -12,13 +12,14 @@ class Supplier extends Model
     protected $fillable = ['nama', 'nomor', 'alamat', 'status'];
     protected $primaryKey = 'id';
 
-    public static function getdatasupplier()
+    public static function tampil()
     {
         // Mengambil data kategori yang statusnya 0
         return Supplier::where('status', 1)->get();
         
     }
-    public static function storesupplier($request) {
+
+    public static function tambah($request) {
         $request->validate([
             'nama' => 'required',
             'nomor' => 'required',
@@ -39,12 +40,12 @@ class Supplier extends Model
        return Supplier::create($supplier);
     }
 
-    public static function arsipdata()
+    public static function tampilArsip()
     {
         return Supplier::where('status', 0)->get();
     }
 
-    public static function pulihsupplier($id) {
+    public static function pulih($id) {
         $supplier = Supplier::find($id);
         if ($supplier) {
             $supplier->status = 1;
@@ -52,7 +53,7 @@ class Supplier extends Model
         }
         return $supplier;
     }
-    public static function arsipsupplier($id) {
+    public static function arsip($id) {
         $supplier = Supplier::find($id);
         if ($supplier) {
             $supplier->status = 0;
@@ -61,11 +62,11 @@ class Supplier extends Model
         return $supplier;
     }
 
-    public static function ubahsupplier($id) {
+    public static function ubah($id) {
         return Supplier::where('id', $id)->first();
     }
 
-    public static function updatesupplier($request, $id)
+    public static function ganti($request, $id)
     {
         $request->validate([
             'nama' => 'required',

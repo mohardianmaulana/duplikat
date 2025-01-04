@@ -6,9 +6,12 @@
     @include('template.header')
 
     <style>
-        .table td, .table th {
-            vertical-align: middle; /* Untuk vertikal */
-            text-align: center; /* Untuk horizontal */
+        .table td,
+        .table th {
+            vertical-align: middle;
+            /* Untuk vertikal */
+            text-align: center;
+            /* Untuk horizontal */
         }
     </style>
 </head>
@@ -42,18 +45,18 @@
 
                     <div class="my-3 p-3 bg-body shadow-sm" style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
                         @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                         @endif
                         @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
                         @endif
 
                         <table class="table table-striped" id="myTable">
@@ -73,32 +76,32 @@
                             </thead>
                             <tbody>
                                 @foreach ($barang as $item)
-                                    <tr class="text-center">
-                                        <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
-                                        <td class="col-md-1 text-center">{{ $item->nama }}</td>
-                                        <td class="col-md-1 text-center">{{ $item->kategori_nama }}</td>
-                                        <td class="col-md-1 text-center">
+                                <tr class="text-center">
+                                    <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
+                                    <td class="col-md-1 text-center">{{ $item->nama }}</td>
+                                    <td class="col-md-1 text-center">{{ $item->kategori_nama }}</td>
+                                    <td class="col-md-1 text-center">
                                         @if(isset($rataRataHargaBeli[$item->id]))
-                                            Rp. {{ number_format($rataRataHargaBeli[$item->id], 0, ',', '.') }}
+                                        Rp. {{ number_format($rataRataHargaBeli[$item->id], 0, ',', '.') }}
                                         @else
-                                            -
+                                        -
                                         @endif</td>
-                                        <td class="col-md-1 text-center">Rp. {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
-                                        <td class="col-md-1 text-center">{{ $item->jumlah }}</td>
-                                        <td class="col-md-1 text-center">
-                                            <img src="{{ asset('img/' . ($item->gambar ?: $item->kategori_gambar)) }}" alt="Gambar" style="max-width: 200px; max-height: 200px;">
-                                        </td>
-                                        @if (Auth::check() && Auth::user()->hasRole('admin'))
-                                        <td>
-                                            <div class="text-center d-flex align-items-end">
-                                                @if ($item->jumlah > $item->minLimit && $item->jumlah < $item->maxLimit)
-                                                    <i class="fas fa-circle fa-lg" style="color:transparent"></i>
+                                    <td class="col-md-1 text-center">Rp. {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                                    <td class="col-md-1 text-center">{{ $item->jumlah }}</td>
+                                    <td class="col-md-1 text-center">
+                                        <img src="{{ asset('img/' . ($item->gambar ?: $item->kategori_gambar)) }}" alt="Gambar" style="max-width: 200px; max-height: 200px;">
+                                    </td>
+                                    @if (Auth::check() && Auth::user()->hasRole('admin'))
+                                    <td>
+                                        <div class="text-center d-flex align-items-end">
+                                            @if ($item->jumlah > $item->minLimit && $item->jumlah < $item->maxLimit)
+                                                <i class="fas fa-circle fa-lg" style="color:transparent"></i>
                                                 @elseif ($item->jumlah <= $item->minLimit)
                                                     <i class="fas fa-exclamation-circle fa-lg" style="color: red"></i>
-                                                @elseif ($item->jumlah >= $item->maxLimit)
+                                                    @elseif ($item->jumlah >= $item->maxLimit)
                                                     <i class="fas fa-exclamation-circle fa-lg" style="color: orange"></i>
-                                                @endif
-                                                @php
+                                                    @endif
+                                                    @php
                                                     $persetujuanForUser = \App\Models\Persetujuan::where('barang_id', $item->id)
                                                     ->where('user_id', Auth::id())
                                                     ->where('kerjaAksi', 'update')
@@ -106,38 +109,38 @@
                                                     ->first();
                                                     $persetujuanIsiForm = $persetujuanForUser && $persetujuanForUser->kodePersetujuan !== null;
                                                     $persetujuanDisetujui = $persetujuanIsiForm && $persetujuanForUser->lagiProses == 1;
-                                                @endphp
+                                                    @endphp
 
-                                                @if (!$persetujuanForUser)
-                                                <a href="#" onclick="showConfirmModal('{{ url('barang/' . $item->id . '/checkEdit') }}')" class="btn btn-primary btn-sm mx-2">
-                                                    <i class="fas fa-edit"></i>
-                                                    Edit
-                                                </a>
-                                                @elseif ($persetujuanDisetujui)
-                                                <a href="{{ route('barang.edit', $item->id) }}" class="btn btn-primary btn-sm mx-2">
-                                                    <i class="fas fa-edit"></i>
-                                                    Edit
-                                                </a>
-                                                @elseif ($persetujuanIsiForm && !$persetujuanDisetujui)
-                                                <a href="#" onclick="showInputCodeModal()" class="btn btn-primary btn-sm mx-2">
-                                                    <i class="fas fa-edit"></i>
-                                                    Edit
-                                                </a>
-                                                @else 
-                                                <a href="#" onclick="showWaitModal()" class="btn btn-primary btn-sm mx-2">
-                                                    <i class="fas fa-edit"></i>
-                                                    Edit
-                                                </a>
-                                                @endif
-                                                
-                                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalArsipkan" data-id="{{ $item->id }}">
-                                                    <i class="fas fa-sync-alt"></i> Arsipkan
-                                                </button>
-                                            </div>
-                                            
-                                        </td>
-                                        @endif
-                                    </tr>
+                                                    @if (!$persetujuanForUser)
+                                                    <a href="#" onclick="showConfirmModal('{{ url('barang/' . $item->id . '/checkEdit') }}')" class="btn btn-primary btn-sm mx-2">
+                                                        <i class="fas fa-edit"></i>
+                                                        Edit
+                                                    </a>
+                                                    @elseif ($persetujuanDisetujui)
+                                                    <a href="{{ route('barang.edit', $item->id) }}" class="btn btn-primary btn-sm mx-2">
+                                                        <i class="fas fa-edit"></i>
+                                                        Edit
+                                                    </a>
+                                                    @elseif ($persetujuanIsiForm && !$persetujuanDisetujui)
+                                                    <a href="#" onclick="showInputCodeModal()" class="btn btn-primary btn-sm mx-2">
+                                                        <i class="fas fa-edit"></i>
+                                                        Edit
+                                                    </a>
+                                                    @else
+                                                    <a href="#" onclick="showWaitModal()" class="btn btn-primary btn-sm mx-2">
+                                                        <i class="fas fa-edit"></i>
+                                                        Edit
+                                                    </a>
+                                                    @endif
+
+                                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalArsipkan" data-id="{{ $item->id }}">
+                                                        <i class="fas fa-sync-alt"></i> Arsipkan
+                                                    </button>
+                                        </div>
+
+                                    </td>
+                                    @endif
+                                </tr>
                                 @endforeach
                             </tbody>
                         </table>
@@ -263,10 +266,10 @@
     </script>
 
     <script>
-        $('#modalArsipkan').on('show.bs.modal', function (event) {
+        $('#modalArsipkan').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget);
             var id = button.data('id');
-            var action = '{{ url('barang/arsipkan') }}/' + id;
+            var action = '{{ url("/barang/arsipkan/") }}/' + id;
             var modal = $(this);
             modal.find('#formArsipkan').attr('action', action);
         });
@@ -290,4 +293,3 @@
 @include('sweetalert::alert')
 
 </html>
-

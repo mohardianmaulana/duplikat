@@ -31,47 +31,47 @@
                     <h1 class="h3 mb-4 text-gray-800">Daftar Customer</h1>
 
                     <div class="my-3 p-3 bg-body shadow-sm"
-                    style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
-                    @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
+                        @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                         @endif
                         @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                    <!-- TOMBOL TAMBAH DATA -->
-                    <div class="pb-3" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            @if (Auth::check() && Auth::user()->hasRole('admin'))
-                            <a href="{{ route('customer.create') }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus fa-xs"></i>
-                                Tambah Data
-                            </a>
-                            @endif
+                        <div class="alert alert-success">
+                            {{ session('success') }}
                         </div>
-                    </div>
-
-                    <table id="myTable" class="table table-striped">
-                        <thead>
-                            <tr class="text-center">
-                                <th class="col-md-1 text-center">No</th>
-                                <th class="col-md-2 text-center">Nama</th>
-                                <th class="col-md-3 text-center">Nomor</th>
-                                <th class="col-md-3 text-center">Alamat</th>
+                        @endif
+                        <!-- TOMBOL TAMBAH DATA -->
+                        <div class="pb-3" style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
                                 @if (Auth::check() && Auth::user()->hasRole('admin'))
-                                <th class="col-md-2 text-center">Aksi</th>
+                                <a href="{{ route('customer.create') }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus fa-xs"></i>
+                                    Tambah Data
+                                </a>
                                 @endif
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($customers as $cust)
+                            </div>
+                        </div>
+
+                        <table id="myTable" class="table table-striped">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="col-md-1 text-center">No</th>
+                                    <th class="col-md-2 text-center">Nama</th>
+                                    <th class="col-md-3 text-center">Nomor</th>
+                                    <th class="col-md-3 text-center">Alamat</th>
+                                    @if (Auth::check() && Auth::user()->hasRole('admin'))
+                                    <th class="col-md-2 text-center">Aksi</th>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($customers as $cust)
                                 <tr class="text-center">
                                     <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
                                     <td class="col-md-2 text-center">{{ $cust->nama }}</td>
@@ -81,13 +81,13 @@
                                     <td class="col-md-2 text-center">
                                         <div class="text-center">
                                             @php
-                                                $persetujuanForUser = \App\Models\Persetujuan::where('customer_id', $cust->id)
-                                                    ->where('user_id', Auth::id())
-                                                    ->where('kerjaAksi', 'update')
-                                                    ->where('namaTabel', 'customer')
-                                                    ->first();
-                                                $persetujuanIsiForm = $persetujuanForUser && $persetujuanForUser->kodePersetujuan !== null;
-                                                $persetujuanDisetujui = $persetujuanIsiForm && $persetujuanForUser->lagiProses == 1;
+                                            $persetujuanForUser = \App\Models\Persetujuan::where('customer_id', $cust->id)
+                                            ->where('user_id', Auth::id())
+                                            ->where('kerjaAksi', 'update')
+                                            ->where('namaTabel', 'customer')
+                                            ->first();
+                                            $persetujuanIsiForm = $persetujuanForUser && $persetujuanForUser->kodePersetujuan !== null;
+                                            $persetujuanDisetujui = $persetujuanIsiForm && $persetujuanForUser->lagiProses == 1;
                                             @endphp
                                             @if (!$persetujuanForUser)
                                             <a href="#" onclick="showConfirmModal('{{ url('customer/' . $cust->id . '/checkEdit') }}')" class="btn btn-primary btn-sm mx-2">
@@ -104,13 +104,13 @@
                                                 <i class="fas fa-edit"></i>
                                                 Edit
                                             </a>
-                                            @else 
+                                            @else
                                             <a href="#" onclick="showWaitModal()" class="btn btn-primary btn-sm mx-2">
                                                 <i class="fas fa-edit"></i>
                                                 Edit
                                             </a>
                                             @endif
-                                            
+
                                             <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalArsipkan" data-id="{{ $cust->id }}">
                                                 <i class="fas fa-sync-alt"></i> Arsipkan
                                             </button>
@@ -118,10 +118,10 @@
                                     </td>
                                     @endif
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <!-- /.container-fluid -->
 
@@ -226,10 +226,10 @@
     </div>
 
     <script>
-        $('#modalArsipkan').on('show.bs.modal', function (event) {
+        $('#modalArsipkan').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget);
             var id = button.data('id');
-            var action = '{{ url('customer/arsipkan') }}/' + id;
+            var action = '{{ url("/customer/arsipkan/") }}/' + id;
             var modal = $(this);
             modal.find('#formArsipkan').attr('action', action);
         });

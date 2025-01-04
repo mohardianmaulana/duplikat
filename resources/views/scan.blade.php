@@ -82,7 +82,8 @@
         // Event listener untuk tombol Tambah Tanpa QR
         document.getElementById('tambahTanpaQR').addEventListener('click', () => {
             // Redirect ke halaman tambah barang tanpa QR
-            window.location.href = '{{ route('create_barang') }}';
+            window.location.href = '{{ route('
+            create_barang ') }}';
         });
 
         function scanQRCode() {
@@ -113,8 +114,9 @@
                         } else {
                             resultDiv.innerText = 'QR Code baru, melanjutkan ke halaman tambah barang...';
                             // Redirect ke halaman tambah barang
-                            window.location.href = '{{ route('create_barang') }}?id_qr=' + encodeURIComponent(code
-                            .data);
+                            window.location.href = '{{ route('
+                            create_barang ') }}?id_qr=' + encodeURIComponent(code
+                                .data);
                         }
                     })
                     .catch(error => {

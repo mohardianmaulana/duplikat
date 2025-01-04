@@ -24,14 +24,20 @@ class Barang extends Model
     public function pembelians()
     {
         return $this->belongsToMany(Pembelian::class, 'barang_pembelian')
-                    ->withPivot('jumlah', 'harga', 'jumlah_itemporary', 'harga_itemporary');
+            ->hasMany(Pembelian::class, 'barang_id')
+            ->withPivot('jumlah', 'harga', 'jumlah_itemporary', 'harga_itemporary');
     }
 
     // Relasi dengan Penjualan
     public function penjualans()
     {
         return $this->belongsToMany(Penjualan::class, 'barang_penjualan')
-                    ->withPivot('jumlah', 'harga', 'jumlah_itemporary');
+            ->withPivot('jumlah', 'harga', 'jumlah_itemporary');
+    }
+
+    public function barangs()
+    {
+        return $this->hasMany(Pembelian::class, 'barang_id');
     }
 
     // Method untuk mendapatkan data barang, kategori, dan harga terbaru
@@ -44,41 +50,44 @@ class Barang extends Model
 
         // Membuat query join antara tabel 'barang', 'kategori', dan 'harga_barang' menggunakan subquery
         return self::join('kategori', 'barang.kategori_id', '=', 'kategori.id')
-            ->joinSub($subquery, 'hb_latest', function($join) {
+            ->joinSub($subquery, 'hb_latest', function ($join) {
                 $join->on('barang.id', '=', 'hb_latest.barang_id');
             })
-            ->join('harga_barang', function($join) {
+            ->join('harga_barang', function ($join) {
                 $join->on('hb_latest.barang_id', '=', 'harga_barang.barang_id')
-                     ->on('hb_latest.max_tanggal_mulai', '=', 'harga_barang.tanggal_mulai');
+                    ->on('hb_latest.max_tanggal_mulai', '=', 'harga_barang.tanggal_mulai');
             })
             ->where('barang.status', 1) // Hanya barang dengan status aktif
+            ->whereNull('harga_barang.tanggal_selesai')
             ->select(
-                'barang.id', 
-                'barang.nama', 
-                'barang.kategori_id', 
-                'kategori.nama_kategori as kategori_nama', 
+                'barang.id',
+                'barang.nama',
+                'barang.kategori_id',
+                'kategori.nama_kategori as kategori_nama',
                 'kategori.gambar_kategori as kategori_gambar',
-                DB::raw('MIN(harga_barang.harga_beli) as harga_beli'), 
-                'harga_barang.harga_jual', 
-                'barang.jumlah', 
-                'barang.minLimit', 
+                'harga_barang.harga_beli', // Ambil harga beli yang terkait dengan harga terbaru
+                'harga_barang.harga_jual',
+                'barang.jumlah',
+                'barang.minLimit',
                 'barang.maxLimit',
-                'barang.gambar',
+                'barang.gambar'
             )
             ->groupBy(
-                'barang.id', 
-                'barang.nama', 
-                'barang.kategori_id', 
-                'kategori.nama_kategori', 
-                'kategori.gambar_kategori', 
-                'harga_barang.harga_jual', 
-                'barang.jumlah', 
-                'barang.minLimit', 
+                'barang.id',
+                'barang.nama',
+                'barang.kategori_id',
+                'kategori.nama_kategori',
+                'kategori.gambar_kategori',
+                'harga_barang.harga_beli',
+                'harga_barang.harga_jual',
+                'barang.jumlah',
+                'barang.minLimit',
                 'barang.maxLimit',
-                'barang.gambar',
+                'barang.gambar'
             )
             ->get();
     }
+
 
     // Method untuk menghitung rata-rata harga beli
     public static function getAverageHargaBeli()
@@ -102,23 +111,23 @@ class Barang extends Model
     {
         // Membuat subquery untuk mendapatkan harga terbaru dari tabel harga_barang
         $subquery = DB::table('harga_barang')
-        ->select('barang_id', DB::raw('MAX(tanggal_mulai) as max_tanggal_mulai'))
-        ->groupBy('barang_id');
+            ->select('barang_id', DB::raw('MAX(tanggal_mulai) as max_tanggal_mulai'))
+            ->groupBy('barang_id');
 
         // Membuat query join antara tabel 'barang', 'kategori', dan 'harga_barang' menggunakan subquery
         $barang = Barang::join('kategori', 'barang.kategori_id', '=', 'kategori.id')
-        ->joinSub($subquery, 'hb_latest', function($join) {
-            $join->on('barang.id', '=', 'hb_latest.barang_id');
-        })
-        ->join('harga_barang', function($join) {
-            $join->on('hb_latest.barang_id', '=', 'harga_barang.barang_id')
-                ->on('hb_latest.max_tanggal_mulai', '=', 'harga_barang.tanggal_mulai');
-        })
-        ->where('barang.status', 0) // Menambahkan kondisi where untuk barang dengan status 1
-        ->whereNotNull('harga_barang.harga_jual') // Menambahkan kondisi where untuk harga_jual yang tidak null
-        ->select('barang.id', 'barang.nama', 'barang.kategori_id', 'kategori.nama_kategori as kategori_nama', DB::raw('MIN(harga_barang.harga_beli) as harga_beli'), 'harga_barang.harga_jual', 'barang.jumlah', 'barang.minLimit', 'barang.maxLimit') // Pastikan minLimit dan maxLimit disertakan
-        ->groupBy('barang.id', 'barang.nama', 'barang.kategori_id', 'kategori.nama_kategori', 'harga_barang.harga_jual', 'barang.jumlah', 'barang.minLimit', 'barang.maxLimit') // Tambahkan minLimit dan maxLimit di sini juga
-        ->get();
+            ->joinSub($subquery, 'hb_latest', function ($join) {
+                $join->on('barang.id', '=', 'hb_latest.barang_id');
+            })
+            ->join('harga_barang', function ($join) {
+                $join->on('hb_latest.barang_id', '=', 'harga_barang.barang_id')
+                    ->on('hb_latest.max_tanggal_mulai', '=', 'harga_barang.tanggal_mulai');
+            })
+            ->where('barang.status', 0) // Menambahkan kondisi where untuk barang dengan status 1
+            ->whereNotNull('harga_barang.harga_jual') // Menambahkan kondisi where untuk harga_jual yang tidak null
+            ->select('barang.id', 'barang.nama', 'barang.kategori_id', 'kategori.nama_kategori as kategori_nama', DB::raw('MIN(harga_barang.harga_beli) as harga_beli'), 'harga_barang.harga_jual', 'barang.jumlah', 'barang.minLimit', 'barang.maxLimit') // Pastikan minLimit dan maxLimit disertakan
+            ->groupBy('barang.id', 'barang.nama', 'barang.kategori_id', 'kategori.nama_kategori', 'harga_barang.harga_jual', 'barang.jumlah', 'barang.minLimit', 'barang.maxLimit') // Tambahkan minLimit dan maxLimit di sini juga
+            ->get();
 
         return $barang;
     }
@@ -143,8 +152,6 @@ class Barang extends Model
         return $barang;
     }
 
-    
-
     public static function ubah($id)
     {
         // Subquery untuk mendapatkan harga terbaru dari tabel harga_barang
@@ -154,10 +161,10 @@ class Barang extends Model
 
         // Query untuk join tabel barang, kategori, dan harga_barang menggunakan subquery
         $barang = self::join('kategori', 'barang.kategori_id', '=', 'kategori.id')
-            ->joinSub($subquery, 'hb_latest', function($join) {
+            ->joinSub($subquery, 'hb_latest', function ($join) {
                 $join->on('barang.id', '=', 'hb_latest.barang_id');
             })
-            ->join('harga_barang', function($join) {
+            ->join('harga_barang', function ($join) {
                 $join->on('hb_latest.barang_id', '=', 'harga_barang.barang_id')
                     ->on('hb_latest.max_tanggal_mulai', '=', 'harga_barang.tanggal_mulai');
             })
@@ -201,13 +208,13 @@ class Barang extends Model
         }
 
         $namaFile = null;
-    if ($request->hasFile('gambar')) {
-    $nm = $request->gambar;
-    $namaFile = $nm->getClientOriginalName();
-    // $namaFile = time().rand(100,999).".".$nm->getClientOriginalExtension();
+        if ($request->hasFile('gambar')) {
+            $nm = $request->gambar;
+            $namaFile = $nm->getClientOriginalName();
+            // $namaFile = time().rand(100,999).".".$nm->getClientOriginalExtension();
 
-    $nm->move(public_path().'/img', $namaFile);
-    }
+            $nm->move(public_path() . '/img', $namaFile);
+        }
 
         // Update data barang
         $barang = [

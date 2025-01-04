@@ -31,36 +31,36 @@
                     <h1 class="h3 mb-4 text-gray-800">Arsip Customer</h1>
 
                     <div class="my-3 p-3 bg-body shadow-sm"
-                    style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
-                    @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
+                        @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                         @endif
                         @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
                         @endif
 
-                    <table id="myTable" class="table table-striped">
-                        <thead>
-                            <tr class="text-center">
-                                <th class="col-md-1 text-center">No</th>
-                                <th class="col-md-2 text-center">Nama</th>
-                                <th class="col-md-3 text-center">Nomor</th>
-                                <th class="col-md-3 text-center">Alamat</th>
-                                @if (Auth::check() && Auth::user()->hasRole('admin'))
-                                <th class="col-md-2 text-center">Aksi</th>
-                                @endif
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($customers as $cust)
+                        <table id="myTable" class="table table-striped">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="col-md-1 text-center">No</th>
+                                    <th class="col-md-2 text-center">Nama</th>
+                                    <th class="col-md-3 text-center">Nomor</th>
+                                    <th class="col-md-3 text-center">Alamat</th>
+                                    @if (Auth::check() && Auth::user()->hasRole('admin'))
+                                    <th class="col-md-2 text-center">Aksi</th>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($customers as $cust)
                                 <tr class="text-center">
                                     <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
                                     <td class="col-md-2 text-center">{{ $cust->nama }}</td>
@@ -76,10 +76,10 @@
                                     </td>
                                     @endif
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <!-- /.container-fluid -->
 
@@ -198,10 +198,10 @@
         }
     </script>
     <script>
-        $('#modalPulihkan').on('show.bs.modal', function (event) {
+        $('#modalPulihkan').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget);
             var id = button.data('id');
-            var action = '{{ url('customer/pulihkan') }}/' + id;
+            var action = '{{ url("/customer/pulihkan/") }}/' + id;
             var modal = $(this);
             modal.find('#formPulihkan').attr('action', action);
         });

@@ -14,6 +14,11 @@ class HargaBarang extends Model
         'barang_id', 'supplier_id', 'harga_beli', 'harga_jual', 'tanggal_mulai', 'tanggal_selesai'
     ];
 
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class);
+    }
+
     public static function viewHarga(){
         // Membuat query join antara tabel 'harga_barang', 'barang', dan 'supplier' dan mengeksekusinya
         $hargaBarang = HargaBarang::leftJoin('barang', 'harga_barang.barang_id', '=', 'barang.id')
@@ -64,10 +69,5 @@ class HargaBarang extends Model
     public function getFormattedTanggalSelesaiAttribute()
     {
     return $this->attributes['tanggal_selesai'] ? Carbon::parse($this->attributes['tanggal_selesai'])->format('d-m-Y') : null;
-    }
-
-    public function barang()
-    {
-        return $this->belongsTo(Barang::class);
     }
 }

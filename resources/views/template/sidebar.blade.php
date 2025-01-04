@@ -154,13 +154,13 @@
         </a>
     </li>
     @endif
-    <!-- Nav Item - Dashboard -->
+    <!-- Nav Item - Dashboard
     <li class="nav-item">
         <a class="nav-link" href="/register">
             <i class="fas fa-users"></i>
             <span>Register</span>
         </a>
-    </li>
+    </li> -->
 
     <li class="nav-item">
         <a class="nav-link" href="/katalog">

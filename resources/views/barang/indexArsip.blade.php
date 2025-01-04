@@ -35,18 +35,18 @@
 
                     <div class="my-3 p-3 bg-body shadow-sm" style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
                         @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                         @endif
                         @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
                         @endif
 
                         <table class="table table-striped" id="myTable">
@@ -63,35 +63,35 @@
                             </thead>
                             <tbody>
                                 @foreach ($barang as $item)
-                                    <tr class="text-center">
-                                        <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
-                                        <td class="col-md-1 text-center">{{ $item->nama }}</td>
-                                        <td class="col-md-1 text-center">{{ $item->kategori_nama }}</td>
-                                        <td class="col-md-1 text-center">@if(isset($rataRataHargaBeli[$item->id]))
-                                            Rp. {{ number_format($rataRataHargaBeli[$item->id], 0, ',', '.') }}
+                                <tr class="text-center">
+                                    <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
+                                    <td class="col-md-1 text-center">{{ $item->nama }}</td>
+                                    <td class="col-md-1 text-center">{{ $item->kategori_nama }}</td>
+                                    <td class="col-md-1 text-center">@if(isset($rataRataHargaBeli[$item->id]))
+                                        Rp. {{ number_format($rataRataHargaBeli[$item->id], 0, ',', '.') }}
                                         @else
-                                            -
+                                        -
                                         @endif</td>
-                                        <td class="col-md-1 text-center">Rp. {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
-                                        <td class="col-md-1 text-center">{{ $item->jumlah }}</td>
-                                        <td>
-                                            <div class="text-center d-flex align-items-end">
-                                                @if ($item->jumlah > $item->minLimit && $item->jumlah < $item->maxLimit)
-                                                    <i class="fas fa-circle fa-lg" style="color:transparent"></i>
+                                    <td class="col-md-1 text-center">Rp. {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                                    <td class="col-md-1 text-center">{{ $item->jumlah }}</td>
+                                    <td>
+                                        <div class="text-center d-flex align-items-end">
+                                            @if ($item->jumlah > $item->minLimit && $item->jumlah < $item->maxLimit)
+                                                <i class="fas fa-circle fa-lg" style="color:transparent"></i>
                                                 @elseif ($item->jumlah <= $item->minLimit)
                                                     <i class="fas fa-exclamation-circle fa-lg" style="color: red"></i>
-                                                @elseif ($item->jumlah >= $item->maxLimit)
+                                                    @elseif ($item->jumlah >= $item->maxLimit)
                                                     <i class="fas fa-exclamation-circle fa-lg" style="color: orange"></i>
-                                                @endif
-                                                @if (Auth::check() && Auth::user()->hasRole('admin'))
-                                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalPulihkan" data-id="{{ $item->id }}">
-                                                    <i class="fas fa-sync-alt"></i> Pulihkan
-                                                </button>
-                                            </div>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @endforeach
+                                                    @endif
+                                                    @if (Auth::check() && Auth::user()->hasRole('admin'))
+                                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalPulihkan" data-id="{{ $item->id }}">
+                                                        <i class="fas fa-sync-alt"></i> Pulihkan
+                                                    </button>
+                                        </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -215,15 +215,15 @@
         }
     </script>
 
-<script>
-    $('#modalPulihkan').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var id = button.data('id');
-        var action = '{{ url('barang/pulihkan') }}/' + id;
-        var modal = $(this);
-        modal.find('#formPulihkan').attr('action', action);
-    });
-</script>
+    <script>
+        $('#modalPulihkan').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var action = '{{ url("/barang/pulihkan/") }}/' + id;
+            var modal = $(this);
+            modal.find('#formPulihkan').attr('action', action);
+        });
+    </script>
 
 </body>
 

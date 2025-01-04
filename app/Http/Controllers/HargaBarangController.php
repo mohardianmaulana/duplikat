@@ -9,14 +9,14 @@ use Illuminate\Http\Request;
 class HargaBarangController extends Controller
 {
     public function index(Request $request)
-{
-    $hargaBarang = HargaBarang::viewHarga();
+    {
+        $hargaBarang = HargaBarang::viewHarga();
 
-    return view('hargaBarang.index', compact('hargaBarang'));
-}
-    
+        return view('hargaBarang.index', compact('hargaBarang'));
+    }
 
-    public function edit($id) 
+
+    public function edit($id)
     {
         // Mengambil data harga barang yang ingin diedit dengan join tabel barang untuk mendapatkan nama barang
         $hargaBarang = HargaBarang::editHarga($id);

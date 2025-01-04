@@ -52,17 +52,17 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($penjualan as $item)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $item->barang_nama }}</td>
-                                                <td>{{ $item->nama_customer }}</td>
-                                                <td>{{ $item->total_item }}</td>
-                                                <td>{{ $item->total_harga }}</td>
-                                                <td>{{ $item->bayar }}</td>
-                                                <td>{{ $item->kembali }}</td>
-                                                <td>{{ $item->nama_user }}</td>
-                                                <td>{{ $item->tanggal_transaksi }}</td>
-                                            </tr>
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $item->barang_nama }}</td>
+                                            <td>{{ $item->nama_customer }}</td>
+                                            <td>{{ $item->total_item }}</td>
+                                            <td>{{ $item->total_harga }}</td>
+                                            <td>{{ $item->bayar }}</td>
+                                            <td>{{ $item->kembali }}</td>
+                                            <td>{{ $item->nama_user }}</td>
+                                            <td>{{ $item->tanggal_transaksi }}</td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                 </table>

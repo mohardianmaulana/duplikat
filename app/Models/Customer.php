@@ -4,11 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-
-use function Laravel\Prompts\error;
 
 class Customer extends Model
 {
@@ -35,36 +32,41 @@ class Customer extends Model
         return $customer;
     }
 
-    public static function storeCustomer($request){
-        $validator = Validator::make($request->all(), [
-            'nama' => 'required',
-            'nomor' => 'required',
-            'alamat' => 'required',
-        ], [
-            'nama.required'=>'Nama customer wajib diisi',
-            'nomor.required'=>'Nomor HP wajib diisi',
-            'alamat.required'=>'Alamat wajib diisi',
-        ]);
-        
-        if ($validator->fails()) {
-            return redirect()->back()
-                             ->withErrors($validator)
-                             ->withInput();
-        }
+    public static function storeCustomer($request)
+{
+    $validator = Validator::make($request->all(), [
+        'nama' => 'required',
+        'nomor' => 'required',
+        'alamat' => 'required',
+    ], [
+        'nama.required' => 'Nama customer wajib diisi',
+        'nomor.required' => 'Nomor HP wajib diisi',
+        'alamat.required' => 'Alamat wajib diisi',
+    ]);
 
-        $customer = Customer::create([
-            'nama'=>$request->nama,
-            'nomor'=>$request->nomor,
-            'alamat'=>$request->alamat,
-            'status' => 1, // Set status to 1
-        ]);
-        return $customer;
+    if ($validator->fails()) {
+        return [
+            'status' => 'error',
+            'errors' => $validator->errors(),
+        ];
     }
+
+    // Simpan data customer
+    Customer::create([
+        'nama' => $request->nama,
+        'nomor' => $request->nomor,
+        'alamat' => $request->alamat,
+        'status' => 1, // Set status to 1
+    ]);
+
+    return ['status' => 'success'];
+}
+
 
     // Method untuk mendapatkan customer berdasarkan ID
     public static function editCustomer($id)
     {
-        return self::where('id', $id)->first();
+        return Customer::where('id', $id)->first();
     }
 
     // Method untuk update customer berdasarkan request dan ID

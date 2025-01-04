@@ -33,18 +33,18 @@
 
                     <div class="my-3 p-3 bg-body shadow-sm" style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
                         @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                         @endif
                         @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
                         @endif
                         @if (Auth::check() && Auth::user()->hasRole('admin'))
                         <div class="pb-3 d-flex justify-content-start">
@@ -71,39 +71,39 @@
                                 </tr>
                             </thead>
                             <tbody>
-                              @foreach ($pembelian as $item)
-                                  <tr class="text-center">
-                                      <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
-                                      <td class="col-md-1 text-center">{{ \Carbon\Carbon::parse($item->tanggal_transaksi)->format('d-m-Y') }}</td>
-                                      <td class="col-md-1 text-center">{{ $item->supplier_nama }}</td>
-                                      <td class="col-md-1 text-center">{{ $item->total_item }}</td>
-                                      <td class="col-md-1 text-center">Rp. {{ number_format($item->total_harga, 0, ',', '.') }}</td>
-                                      <td class="col-md-1 text-center">{{ $item->user_nama }}</td>
-                                      <td class="col-md-2 text-center">
-                                          <div class="text-center">
+                                @foreach ($pembelian as $item)
+                                <tr class="text-center">
+                                    <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
+                                    <td class="col-md-1 text-center">{{ \Carbon\Carbon::parse($item->tanggal_transaksi)->format('d-m-Y') }}</td>
+                                    <td class="col-md-1 text-center">{{ $item->supplier_nama }}</td>
+                                    <td class="col-md-1 text-center">{{ $item->total_item }}</td>
+                                    <td class="col-md-1 text-center">Rp. {{ number_format($item->total_harga, 0, ',', '.') }}</td>
+                                    <td class="col-md-1 text-center">{{ $item->user_nama }}</td>
+                                    <td class="col-md-2 text-center">
+                                        <div class="text-center">
                                             <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalDetail{{ $item->id }}">
                                                 <i class="fas fa-info-circle"></i> Detail
                                             </button>
                                             @if (Auth::check() && Auth::user()->hasRole('admin'))
                                             @if ($item->status == 1)
-                                                <a href="{{ url('pembelian/'.$item->id.'/edit-barang-baru') }}" class="btn btn-warning btn-sm">
-                                                    <i class="fas fa-edit"></i>
-                                                    Edit
-                                                </a>
+                                            <a href="{{ url('pembelian/'.$item->id.'/edit-barang-baru') }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                                Edit
+                                            </a>
                                             @else
-                                                <a href="{{ url('pembelian/'.$item->id.'/edit') }}" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-edit"></i>
-                                                    Edit
-                                                </a>
+                                            <a href="{{ url('pembelian/'.$item->id.'/edit') }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                                Edit
+                                            </a>
                                             @endif
 
                                             @endif
-                                          </div>
-                                      </td>
-                                  </tr>
-                              @endforeach
-                          </tbody>                                
-                          </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
 
                 </div>
@@ -139,18 +139,18 @@
                 </div>
                 <div class="modal-body">
                     <h5>Detail Barang</h5>
-                <table class="table table-striped">
-                    <thead>
-                        <tr class="text-center">
-                            <th class="col-md-1 text-center">No</th>
-                            <th class="col-md-3 text-center">Nama Barang</th>
-                            <th class="col-md-2 text-center">Harga</th>
-                            <th class="col-md-2 text-center">Jumlah</th>
-                            <th class="col-md-2 text-center">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($item->barangs as $barang)
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="col-md-1 text-center">No</th>
+                                <th class="col-md-3 text-center">Nama Barang</th>
+                                <th class="col-md-2 text-center">Harga</th>
+                                <th class="col-md-2 text-center">Jumlah</th>
+                                <th class="col-md-2 text-center">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($item->barangs as $barang)
                             <tr class="text-center">
                                 <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
                                 <td class="col-md-3 text-center">{{ $barang->nama }}</td>
@@ -158,10 +158,10 @@
                                 <td class="col-md-2 text-center">{{ $barang->pivot->jumlah }}</td>
                                 <td class="col-md-2 text-center">Rp. {{ number_format($barang->pivot->harga * $barang->pivot->jumlah, 0, ',', '.') }}</td>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
@@ -202,20 +202,20 @@
                         </thead>
                         <tbody>
                             @foreach ($supplier as $supp)
-                                <tr class="text-center">
-                                    <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
-                                    <td class="col-md-2 text-center">{{ $supp->nama }}</td>
-                                    <td class="col-md-3 text-center">{{ $supp->nomor }}</td>
-                                    <td class="col-md-3 text-center">{{ $supp->alamat }}</td>
-                                    <td class="col-md-2 text-center">
-                                        <div class="text-center">
-                                            <a href="{{ url('pembelian/create') }}?supplier_id={{ $supp->id }}&supplier_nama={{ $supp->nama }}&supplier_nomor={{ $supp->nomor }}&supplier_alamat={{ $supp->alamat }}" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-check-square"></i>
-                                                Pilih
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
+                            <tr class="text-center">
+                                <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
+                                <td class="col-md-2 text-center">{{ $supp->nama }}</td>
+                                <td class="col-md-3 text-center">{{ $supp->nomor }}</td>
+                                <td class="col-md-3 text-center">{{ $supp->alamat }}</td>
+                                <td class="col-md-2 text-center">
+                                    <div class="text-center">
+                                        <a href="{{ url('pembelian/create') }}?supplier_id={{ $supp->id }}&supplier_nama={{ $supp->nama }}&supplier_nomor={{ $supp->nomor }}&supplier_alamat={{ $supp->alamat }}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-check-square"></i>
+                                            Pilih
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -226,32 +226,33 @@
 
     @include('template.modal_logout')
     @include('template.script')
-    
+
     <script>
         $(document).ready(function() {
             $('#searchButton').on('click', function() {
                 performSearch();
             });
-    
+
             $('#searchInput').on('keypress', function(e) {
                 if (e.which === 13) {
                     performSearch();
-                    return false; 
+                    return false;
                 }
             });
-    
+
             function performSearch() {
                 var katakunci = $('#searchInput').val().toLowerCase();
                 $('#myTableModal tbody tr').filter(function() {
                     $(this).toggle($(this).text().toLowerCase().indexOf(katakunci) > -1)
                 });
             }
-    
-            $('#modalCreate').on('hidden.bs.modal', function () {
+
+            $('#modalCreate').on('hidden.bs.modal', function() {
                 $('#searchInput').val('');
-                $('#myTableModal tbody tr').show(); 
+                $('#myTableModal tbody tr').show();
             });
         });
     </script>
 </body>
+
 </html>

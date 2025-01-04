@@ -66,7 +66,7 @@ class Kategori extends Model
 
     public static function editKategori($id)
     {
-        return self::where('id', $id)->first();
+        return Kategori::where('id', $id)->first();
     }
 
     public static function updateKategori($id, $data)

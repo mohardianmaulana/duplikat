@@ -91,61 +91,61 @@ class BarangController extends Controller
         return redirect()->route('admin')->with('success', 'Barang berhasil diarsipkan.');
     }
 
-    public function scanPage()
-    {
-        return view('scan');
-    }
+    // public function scanPage()
+    // {
+    //     return view('scan');
+    // }
 
-    // Memproses hasil scan
-    public function cekQrCode(Request $request)
-    {
-        // Validasi input
-        $request->validate([
-            'id_qr' => 'required',
-        ]);
+    // // Memproses hasil scan
+    // public function cekQrCode(Request $request)
+    // {
+    //     // Validasi input
+    //     $request->validate([
+    //         'id_qr' => 'required',
+    //     ]);
 
-        // Cek apakah QR code sudah ada di database
-        $barang = Barang::where('id_qr', $request->id_qr)->first();
+    //     // Cek apakah QR code sudah ada di database
+    //     $barang = Barang::where('id_qr', $request->id_qr)->first();
 
-        // Jika barang ada, kirim nama barang dan informasi bahwa QR sudah ada
-        if ($barang) {
-            return response()->json(['exists' => true, 'nama' => $barang->nama]);
-        } else {
-            // Jika tidak ada, kirim response bahwa data belum ada
-            return response()->json(['exists' => false]);
-        }
-    }
-
-
-    public function create(Request $request)
-    {
-        // Mengambil nilai id_qr dari request jika ada
-        $id_qr = $request->input('id_qr');
-
-        // Memanggil method dari model Pembelian untuk mendapatkan data
-        $formData = Pembelian::tambahBaru();
-
-        // Mengirimkan data ke view termasuk id_qr jika ada
-        return view('pembelian.create_barang', array_merge($formData, compact('id_qr')));
-    }
+    //     // Jika barang ada, kirim nama barang dan informasi bahwa QR sudah ada
+    //     if ($barang) {
+    //         return response()->json(['exists' => true, 'nama' => $barang->nama]);
+    //     } else {
+    //         // Jika tidak ada, kirim response bahwa data belum ada
+    //         return response()->json(['exists' => false]);
+    //     }
+    // }
 
 
-    public function store(Request $request)
-    {
-        // Memanggil method di model Barang untuk melakukan penyimpanan
-        $result = Barang::storeBarang($request);
+    // public function create(Request $request)
+    // {
+    //     // Mengambil nilai id_qr dari request jika ada
+    //     $id_qr = $request->input('id_qr');
 
-        // Memeriksa status hasil dari model
-        if ($result['status'] == 'error') {
-            // Jika ada error validasi, kembali ke form dengan error
-            return redirect()->back()
-                ->withErrors($result['errors'])
-                ->withInput();
-        }
+    //     // Memanggil method dari model Pembelian untuk mendapatkan data
+    //     $formData = Pembelian::tambahBaru();
 
-        // Jika berhasil, redirect ke halaman pembelian dengan pesan sukses
-        return redirect()->to('pembelian')->with('success', $result['message']);
-    }
+    //     // Mengirimkan data ke view termasuk id_qr jika ada
+    //     return view('pembelian.create_barang', array_merge($formData, compact('id_qr')));
+    // }
+
+
+    // public function store(Request $request)
+    // {
+    //     // Memanggil method di model Barang untuk melakukan penyimpanan
+    //     $result = Barang::storeBarang($request);
+
+    //     // Memeriksa status hasil dari model
+    //     if ($result['status'] == 'error') {
+    //         // Jika ada error validasi, kembali ke form dengan error
+    //         return redirect()->back()
+    //             ->withErrors($result['errors'])
+    //             ->withInput();
+    //     }
+
+    //     // Jika berhasil, redirect ke halaman pembelian dengan pesan sukses
+    //     return redirect()->to('pembelian')->with('success', $result['message']);
+    // }
 
 
     //     public function create()

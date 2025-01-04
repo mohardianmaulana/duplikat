@@ -15,7 +15,7 @@ class RolePermissionSeeder extends Seeder
     {
         $role_admin = Role::updateOrCreate(['name' => 'admin']);
         $role_owner = Role::updateOrCreate(['name' => 'owner']);
-        $role_customer = Role::updateOrCreate(['name' => 'customer']);
+        
 
         ////////////////////////////////////////////////////////////////////////////
 
@@ -31,7 +31,7 @@ class RolePermissionSeeder extends Seeder
         $role_owner -> givePermissionTo($permission2);
         $role_owner -> givePermissionTo($permission3);
 
-        $role_customer -> givePermissionTo($permission2);
+        
 
         ////////////////////////////////////////////////////////////////////////////
 

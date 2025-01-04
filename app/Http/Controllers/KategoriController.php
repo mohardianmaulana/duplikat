@@ -15,14 +15,14 @@ class KategoriController extends Controller
     {
         // Mengambil data kategori yang statusnya 1
         $kategori = Kategori::where('status', 1)->get();
-        
+
         return view('kategori.index', compact('kategori'));
     }
     // public function inde(Request $request)
     // {
     //     // Mengambil data kategori yang statusnya 1
     //     $kategori = Kategori::where('status', 1)->get();
-        
+
     //     return view('kategori.index', compact('kategori'));
     // }
 
@@ -30,7 +30,7 @@ class KategoriController extends Controller
     {
         // Mengambil data kategori yang statusnya 0
         $kategori = Kategori::where('status', 0)->get();
-        
+
         return view('kategori.indexArsip', compact('kategori'));
     }
 
@@ -48,88 +48,43 @@ class KategoriController extends Controller
         return redirect()->route('kategori')->with('success', 'Kategori berhasil diarsipkan.');
     }
 
-
-    public function create() 
+    public function create()
     {
         $kategori = Kategori::all();
-        return view('kategori.create',compact('kategori'));
+        return view('kategori.create', compact('kategori'));
     }
 
     public function store(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'nama_kategori' => 'required',
-        'gambar_kategori' => 'image|file|mimes:jpg,png|min:1|max:2048', // Validasi gambar
-    ], [
-        'nama_kategori.required' => 'Nama Kategori wajib diisi',
-        'gambar_kategori.required' => 'Gambar Kategori wajib diisi',
-    ]);
-
-    if ($validator->fails()) {
-        return redirect()->back()
-            ->withErrors($validator)
-            ->withInput();
-    }
-
-    $nm = $request->gambar_kategori;
-    $namaFile = $nm->getClientOriginalName();
-    // $namaFile = time().rand(100,999).".".$nm->getClientOriginalExtension();
-
-    // $dtUpload = new Kategori();
-    // $dtUpload->nama_kategori = $request->nama_kategori;
-    // $dtUpload->gambar_kategori = $namaFile;
-    // // $dtUpload->status = 1;
-
-    $nm->move(public_path().'/img', $namaFile);
-
-    // $dtUpload->save();
-
-
-    // dd($gambar_kategori);
-
-    // Simpan data kategori ke database
-    Kategori::create([
-        'nama_kategori' => $request->nama_kategori,
-        'gambar_kategori' => $namaFile,
-        'status' => 1,
-    ]);
-
-    return redirect()->route('kategori')->with('success', 'Kategori berhasil ditambahkan');
-}
-
-
-    public function edit($id) 
     {
-        $kategori = Kategori::where('id', $id)->first();
-        return view('kategori.edit', compact('kategori'))->with('kategori', $kategori);
+        $validator = Validator::make($request->all(), [
+            'nama_kategori' => 'required',
+            'gambar_kategori' => 'image|file|mimes:jpg,png|min:1|max:2048', // Validasi gambar
+        ], [
+            'nama_kategori.required' => 'Nama Kategori wajib diisi',
+            'gambar_kategori.required' => 'Gambar Kategori wajib diisi',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $nm = $request->gambar_kategori;
+        $namaFile = $nm->getClientOriginalName();
+
+        $nm->move(public_path() . '/img', $namaFile);
+
+        // Simpan data kategori ke database
+        Kategori::create([
+            'nama_kategori' => $request->nama_kategori,
+            'gambar_kategori' => $namaFile,
+            'status' => 1,
+        ]);
+
+        return redirect()->route('kategori')->with('success', 'Kategori berhasil ditambahkan');
     }
 
-    public function update(Request $request, $id)
-{
-    $request->validate([
-        'nama_kategori' => 'required',
-        'gambar_kategori' => 'image|file|mimes:jpg,png|max:2048', // Validasi gambar
-    ], [
-        'nama_kategori.required' => 'Nama barang Barang wajib diisi',
-        'gambar_kategori.required' => 'Gambar Kategori wajib diisi',
-    ]);
-
-    $nm = $request->gambar_kategori;
-    $namaFile = $nm->getClientOriginalName();
-
-    $nm->move(public_path().'/img', $namaFile);
-
-    // Siapkan data kategori yang ingin diupdate
-    $data = [
-        'nama_kategori' => $request->nama_kategori,
-        'gambar_kategori' => $namaFile,
-    ];
-
-    // Panggil method `updateKategori` dari model Kategori
-    Kategori::updateKategori($id, $data);
-
-    return redirect()->to('kategori')->with('success', 'Berhasil melakukan update data kategori');
-}
     public function checkEdit($id)
     {
         $kategori = Kategori::find($id);
@@ -147,16 +102,16 @@ class KategoriController extends Controller
             'lagiProses' => 0,
             'kodePersetujuan' => null,
         ];
-    
+
         $persetujuan = Persetujuan::where('kategori_id', $kategori->id)
             ->where('user_id', $userId)
             ->where('kerjaAksi', $kerjaAksi)
             ->where('namaTabel', $namaTabel)
             ->first();
-    
+
         $persetujuanIsiForm = $persetujuan && $persetujuan->kodePersetujuan !== null;
         $persetujuanDisetujui = $persetujuanIsiForm && $persetujuan->lagiProses == 1;
-    
+
         if (!$persetujuan) {
             $persetujuan = new Persetujuan();
             $persetujuan->fill($data);
@@ -171,27 +126,62 @@ class KategoriController extends Controller
             return redirect()->to('/kategori')->with('info', 'Tunggu persetujuan dari owner.');
         }
     }
-    public function destroy($id)
-{
-    // ID kategori sementara/temporary
-    $temporaryKategoriId = '5';
 
-    // Pastikan ID kategori sementara tidak sama dengan ID kategori yang akan dihapus
-    if ($id == $temporaryKategoriId) {
-        return redirect()->to('kategori')->with('errors', 'Kategori Temporary tidak dapat dihapus.');
+    public function edit($id)
+    {
+        $kategori = Kategori::where('id', $id)->first();
+        return view('kategori.edit', compact('kategori'))->with('kategori', $kategori);
     }
 
-    // Cek apakah ada toko yang masih terhubung dengan kategori yang akan dihapus
-    $barangCount = Barang::where('kategori_id', $id)->count();
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama_kategori' => 'required',
+            'gambar_kategori' => 'nullable|image|file|mimes:jpg,png|max:2048', // Validasi gambar
+        ], [
+            'nama_kategori.required' => 'Nama barang Barang wajib diisi',
+        ]);
 
-    if ($barangCount > 0) {
-        // Jika ada toko yang terhubung, perbarui kategori_id menjadi kategori sementara
-        Barang::where('kategori_id', $id)->update(['kategori_id' => $temporaryKategoriId]);
+        $namaFile = null;
+        if ($request->hasFile('gambar_kategori')) {
+            $nm = $request->gambar_kategori;
+            $namaFile = $nm->getClientOriginalName();
+
+            $nm->move(public_path() . '/img', $namaFile);
+        }
+
+        // Siapkan data kategori yang ingin diupdate
+        $data = [
+            'nama_kategori' => $request->nama_kategori,
+            'gambar_kategori' => $namaFile,
+        ];
+
+        // Panggil method `updateKategori` dari model Kategori
+        Kategori::updateKategori($id, $data);
+
+        return redirect()->to('kategori')->with('success', 'Berhasil melakukan update data kategori');
     }
+    //     public function destroy($id)
+    // {
+    //     // ID kategori sementara/temporary
+    //     $temporaryKategoriId = '5';
 
-    // Hapus kategori
-    Kategori::where('id', $id)->delete();
+    //     // Pastikan ID kategori sementara tidak sama dengan ID kategori yang akan dihapus
+    //     if ($id == $temporaryKategoriId) {
+    //         return redirect()->to('kategori')->with('errors', 'Kategori Temporary tidak dapat dihapus.');
+    //     }
 
-    return redirect()->to('kategori')->with('success', 'Berhasil menghapus kategori');
-}
+    //     // Cek apakah ada toko yang masih terhubung dengan kategori yang akan dihapus
+    //     $barangCount = Barang::where('kategori_id', $id)->count();
+
+    //     if ($barangCount > 0) {
+    //         // Jika ada toko yang terhubung, perbarui kategori_id menjadi kategori sementara
+    //         Barang::where('kategori_id', $id)->update(['kategori_id' => $temporaryKategoriId]);
+    //     }
+
+    //     // Hapus kategori
+    //     Kategori::where('id', $id)->delete();
+
+    //     return redirect()->to('kategori')->with('success', 'Berhasil menghapus kategori');
+    // }
 }

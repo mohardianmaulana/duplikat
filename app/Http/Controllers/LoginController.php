@@ -28,23 +28,23 @@ class LoginController extends Controller
 
         $captchaValid = $this->validateRecaptcha($recaptcha, $request->ip());
         if (!$captchaValid) {
-        
 
-        // Proses Login
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
-            $role = Auth::user()->role->name ?? 'user'; // Asumsi relasi roles
-            if ($role === 'owner') {
-                return redirect('dashboard')->with('success', 'Login Berhasil');
-            } else if($role === 'admin') {
-                return redirect('dashboard')->with('success', 'Login Berhasil');
+
+            // Proses Login
+            $credentials = $request->only('email', 'password');
+            if (Auth::attempt($credentials)) {
+                $role = Auth::user()->role->name ?? 'user'; // Asumsi relasi roles
+                if ($role === 'owner') {
+                    return redirect('dashboard')->with('success', 'Login Berhasil');
+                } else if ($role === 'admin') {
+                    return redirect('dashboard')->with('success', 'Login Berhasil');
+                } else {
+                    return redirect('login')->with('success', 'Login Berhasil');
+                }
             } else {
-                return redirect('login')->with('success', 'Login Berhasil');
+                Session::flash('error', 'Email atau Password Salah');
+                return redirect('/');
             }
-        } else {
-            Session::flash('error', 'Email atau Password Salah');
-            return redirect('/');
-        }
         }
     }
 

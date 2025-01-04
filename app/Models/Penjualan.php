@@ -17,17 +17,20 @@ class Penjualan extends Model
     public function barangs()
     {
         return $this->belongsToMany(Barang::class, 'barang_penjualan')
-                    ->withPivot('jumlah', 'harga', 'jumlah_itemporary')
-                    ->withTimestamps();
+            ->withPivot('jumlah', 'harga', 'jumlah_itemporary')
+            ->withTimestamps();
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
+
     public function getFormattedTanggalTransaksiAttribute()
     {
         return Carbon::parse($this->attributes['tanggal_transaksi'])->format('d-m-Y');
@@ -71,8 +74,16 @@ class Penjualan extends Model
 
     public static function tambah($customer_id)
     {
-        // Ambil semua barang yang tidak memiliki QR code
-        $barang = Barang::whereNull('id_qr')->get();
+        // Ambil semua barang yang tidak memiliki QR code dan join dengan tabel harga_barang
+        $barang = Barang::leftJoin('harga_barang', 'barang.id', '=', 'harga_barang.barang_id')
+            ->select(
+                'barang.*',
+                'harga_barang.harga_beli',
+                'harga_barang.harga_jual'
+            )
+            ->whereNull('barang.id_qr')
+            ->whereNull('harga_barang.tanggal_selesai') // Hanya ambil harga yang belum selesai
+            ->get();
 
         // Ambil rata-rata harga beli untuk barang yang tidak memiliki tanggal_selesai
         $avgHargaBeli = DB::table('harga_barang')
@@ -143,7 +154,7 @@ class Penjualan extends Model
         $kembali = $bayar - $totalHarga;
 
         // Simpan ke tabel penjualan
-        $penjualan = self::create([
+        $penjualan = Penjualan::create([
             'customer_id' => $request->customer_id,
             'total_item' => $totalItem,
             'total_harga' => $totalHarga,
@@ -171,6 +182,8 @@ class Penjualan extends Model
             $barang->save();
         }
 
+        session()->forget('penjualan_barang');
+
         // Jika berhasil, kembalikan status sukses
         return [
             'status' => 'success',
@@ -180,7 +193,10 @@ class Penjualan extends Model
     public static function edit($id)
     {
         // Ambil data penjualan beserta relasi barangs, customer, dan user
-        $penjualan = self::with(['barangs', 'customer', 'user'])->find($id);
+        $penjualan = Penjualan::with(['barangs', 'customer', 'user'])->find($id);
+
+        $dataBarang = Session()->get('edit_penjualan_barang', []);
+
 
         if (!$penjualan) {
             return [
@@ -201,118 +217,143 @@ class Penjualan extends Model
             ];
         }
 
-        // Ambil semua data barang
-        $barangs = Barang::all();
+        // Ambil semua barang yang tidak memiliki QR code dan join dengan tabel harga_barang
+        $barangs = Barang::leftJoin('harga_barang', 'barang.id', '=', 'harga_barang.barang_id')
+            ->select(
+                'barang.*',
+                'harga_barang.harga_beli',
+                'harga_barang.harga_jual'
+            )
+            ->whereNull('barang.id_qr')
+            ->whereNull('harga_barang.tanggal_selesai') // Hanya ambil harga yang belum selesai
+            ->get();
+
+        // Gabungkan data pivot dan sesi
+        $dataPivot = $penjualan->barangs->map(function ($barang) {
+            return [
+                'id' => $barang->id,
+                'nama' => $barang->nama,
+                'harga' => $barang->pivot->harga, // Data dari pivot
+                'jumlah' => $barang->pivot->jumlah, // Data jumlah dari pivot
+            ];
+        })->toArray(); // Ambil data pivot barang
+        $dataFinal = array_merge($dataPivot, $dataBarang);
+
+        // Pastikan semua elemen di $dataFinal memiliki struktur konsisten
+        $dataFinal = array_map(function ($item) {
+            return is_array($item) ? $item : [];
+        }, $dataFinal);
 
         // Jika berhasil, kembalikan data yang diperlukan
         return [
             'status' => 'success',
+            'dataFinal' => $dataFinal,
+            'dataBarang' => $dataBarang,
             'penjualan' => $penjualan,
             'barangs' => $barangs,
         ];
     }
 
     public static function updatePenjualan($data, $id)
-{
-    // Cari data penjualan berdasarkan ID
-    $penjualan = Penjualan::find($id);
+    {
+        // Cari data penjualan berdasarkan ID
+        $penjualan = Penjualan::find($id);
 
-    if (!$penjualan) {
-        return [
-            'status' => 'error',
-            'message' => 'Penjualan tidak ditemukan.',
-        ];
-    }
+        if (!$penjualan) {
+            return [
+                'status' => 'error',
+                'message' => 'Penjualan tidak ditemukan.',
+            ];
+        }
 
-    // Cek apakah tanggal transaksi lebih dari satu bulan yang lalu
-    $tanggalTransaksi = Carbon::parse($penjualan->tanggal_transaksi);
-    $satuBulanLalu = Carbon::now()->subMonth();
+        // Cek apakah tanggal transaksi lebih dari satu bulan yang lalu
+        $tanggalTransaksi = Carbon::parse($penjualan->tanggal_transaksi);
+        $satuBulanLalu = Carbon::now()->subMonth();
 
-    if ($tanggalTransaksi->lt($satuBulanLalu)) {
-        return [
-            'status' => 'error',
-            'message' => 'Penjualan lebih dari satu bulan tidak dapat diedit.',
-        ];
-    }
+        if ($tanggalTransaksi->lt($satuBulanLalu)) {
+            return [
+                'status' => 'error',
+                'message' => 'Penjualan lebih dari satu bulan tidak dapat diedit.',
+            ];
+        }
 
-    // Hitung total harga dan total item
-    $totalHarga = 0;
-    $totalItem = 0;
+        // Hitung total harga dan total item
+        $totalHarga = 0;
+        $totalItem = 0;
 
-    foreach ($data['harga_jual'] as $index => $harga) {
-        $jumlah = $data['jumlah'][$index];
-        $totalHarga += $harga * $jumlah;
-        $totalItem += $jumlah;
-    }
+        foreach ($data['harga_jual'] as $index => $harga) {
+            $jumlah = $data['jumlah'][$index];
+            $totalHarga += $harga * $jumlah;
+            $totalItem += $jumlah;
+        }
 
-    // Hitung kembali nilai bayar dan kembali
-    $bayar = $data['bayar'];
-    $kembali = $bayar - $totalHarga;
+        // Hitung kembali nilai bayar dan kembali
+        $bayar = $data['bayar'];
+        $kembali = $bayar - $totalHarga;
 
-    // Update data penjualan
-    $penjualan->update([
-        'total_item' => $totalItem,
-        'total_harga' => $totalHarga,
-        'bayar' => $bayar,
-        'kembali' => $kembali,
-        'tanggal_transaksi' => $penjualan->tanggal_transaksi,
-        'user_id' => auth()->id(),
-    ]);
+        // Update data penjualan
+        $penjualan->update([
+            'total_item' => $totalItem,
+            'total_harga' => $totalHarga,
+            'bayar' => $bayar,
+            'kembali' => $kembali,
+            'tanggal_transaksi' => $penjualan->tanggal_transaksi,
+            'user_id' => auth()->id(),
+        ]);
 
-    // Sinkronisasi data ke tabel pivot barang_penjualan
-    foreach ($data['barang_id'] as $index => $barang_id) {
-        $harga = $data['harga_jual'][$index];
-        $jumlah = $data['jumlah'][$index];
+        // Sinkronisasi data ke tabel pivot barang_penjualan
+        foreach ($data['barang_id'] as $index => $barang_id) {
+            $harga = $data['harga_jual'][$index];
+            $jumlah = $data['jumlah'][$index];
 
-        // Ambil data lama dari tabel pivot barang_penjualan
-        $pivotData = DB::table('barang_penjualan')
-            ->where('barang_id', $barang_id)
-            ->where('penjualan_id', $penjualan->id)
-            ->first();
+            // Ambil data lama dari tabel pivot barang_penjualan
+            $pivotData = DB::table('barang_penjualan')
+                ->where('barang_id', $barang_id)
+                ->where('penjualan_id', $penjualan->id)
+                ->first();
 
-        $jumlah_itemporary = $pivotData ? $pivotData->jumlah_itemporary : 0;
+            $jumlah_itemporary = $pivotData ? $pivotData->jumlah_itemporary : 0;
 
-        if ($pivotData) {
-            // Perbarui jumlah barang di pivot table
-            $penjualan->barangs()->updateExistingPivot($barang_id, [
-                'jumlah' => $jumlah,
-                'harga' => $harga,
-                'jumlah_itemporary' => $jumlah,
-            ]);
+            if ($pivotData) {
+                // Perbarui jumlah barang di pivot table
+                $penjualan->barangs()->updateExistingPivot($barang_id, [
+                    'jumlah' => $jumlah,
+                    'harga' => $harga,
+                    'jumlah_itemporary' => $jumlah,
+                ]);
 
-            // Logika penyesuaian stok barang
-            $barang = Barang::find($barang_id);
-            if ($jumlah < $jumlah_itemporary) {
-                $selisihJumlah = $jumlah_itemporary - $jumlah;
-                $barang->jumlah += $selisihJumlah;
-            } elseif ($jumlah > $jumlah_itemporary) {
-                $selisihJumlah = $jumlah - $jumlah_itemporary;
-                $barang->jumlah -= $selisihJumlah;
-            }
+                // Logika penyesuaian stok barang
+                $barang = Barang::find($barang_id);
+                if ($jumlah < $jumlah_itemporary) {
+                    $selisihJumlah = $jumlah_itemporary - $jumlah;
+                    $barang->jumlah += $selisihJumlah;
+                } elseif ($jumlah > $jumlah_itemporary) {
+                    $selisihJumlah = $jumlah - $jumlah_itemporary;
+                    $barang->jumlah -= $selisihJumlah;
+                }
 
-            // Simpan perubahan stok barang jika ada
-            if ($barang->isDirty('jumlah')) {
+                // Simpan perubahan stok barang jika ada
+                if ($barang->isDirty('jumlah')) {
+                    $barang->save();
+                }
+            } else {
+                // Jika tidak ada data lama, tambahkan data baru ke pivot table
+                $penjualan->barangs()->attach($barang_id, [
+                    'jumlah' => $jumlah,
+                    'harga' => $harga,
+                    'jumlah_itemporary' => $jumlah,
+                ]);
+
+                // Kurangi stok barang baru
+                $barang = Barang::find($barang_id);
+                $barang->jumlah -= $jumlah;
                 $barang->save();
             }
-        } else {
-            // Jika tidak ada data lama, tambahkan data baru ke pivot table
-            $penjualan->barangs()->attach($barang_id, [
-                'jumlah' => $jumlah,
-                'harga' => $harga,
-                'jumlah_itemporary' => $jumlah,
-            ]);
-
-            // Kurangi stok barang baru
-            $barang = Barang::find($barang_id);
-            $barang->jumlah -= $jumlah;
-            $barang->save();
         }
+
+        return [
+            'status' => 'success',
+            'message' => 'Penjualan berhasil diperbarui.',
+        ];
     }
-
-    return [
-        'status' => 'success',
-        'message' => 'Penjualan berhasil diperbarui.',
-    ];
-}
-
 }

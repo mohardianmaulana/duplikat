@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,22 +10,26 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
     <script async src="https://www.google.com/recaptcha/api.js"></script>
     <style>
-        body{
+        body {
             background-image: url('img/back.jpg')
         }
+
         .container-centered {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
+
         .logo {
             display: block;
             margin: 10px auto;
-            max-width: 100px; /* Adjust the size as needed */
+            max-width: 100px;
+            /* Adjust the size as needed */
         }
     </style>
 </head>
+
 <body>
     <div class="container container-centered">
         <div class="col-md-4">
@@ -36,9 +41,9 @@
                 </div>
                 <div class="panel-body">
                     @if(session('error'))
-                        <div class="alert alert-danger">
-                            <b>Opps!</b> {{ session('error') }}
-                        </div>
+                    <div class="alert alert-danger">
+                        <b>Opps!</b> {{ session('error') }}
+                    </div>
                     @endif
                     <form action="/actionlogin" method="post">
                         @csrf
@@ -63,4 +68,5 @@
         </div>
     </div>
 </body>
+
 </html>

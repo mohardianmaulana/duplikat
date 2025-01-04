@@ -50,15 +50,15 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($pembelian as $item)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $item->barang_nama }}</td>
-                                                <td>{{ $item->nama_supplier }}</td>
-                                                <td>Rp. {{ number_format($item->harga, 0, ',', '.') }}</td>
-                                                <td>{{ $item->total_item }}</td>
-                                                <td>Rp. {{ number_format($item->total_harga, 0, ',', '.') }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($item->tanggal_transaksi)->format('d-m-Y') }}</td>
-                                            </tr>
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $item->barang_nama }}</td>
+                                            <td>{{ $item->nama_supplier }}</td>
+                                            <td>Rp. {{ number_format($item->harga, 0, ',', '.') }}</td>
+                                            <td>{{ $item->total_item }}</td>
+                                            <td>Rp. {{ number_format($item->total_harga, 0, ',', '.') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($item->tanggal_transaksi)->format('d-m-Y') }}</td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                 </table>

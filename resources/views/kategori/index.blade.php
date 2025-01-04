@@ -6,9 +6,12 @@
     @include('template.header')
 
     <style>
-        .table td, .table th {
-            vertical-align: middle; /* Untuk vertikal */
-            text-align: center; /* Untuk horizontal */
+        .table td,
+        .table th {
+            vertical-align: middle;
+            /* Untuk vertikal */
+            text-align: center;
+            /* Untuk horizontal */
         }
     </style>
 </head>
@@ -39,18 +42,18 @@
 
                     <div class="my-3 p-3 bg-body shadow-sm" style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
                         @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                         @endif
                         @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
                         @endif
                         <!-- TOMBOL TAMBAH DATA -->
                         <div class="pb-3" style="display: flex; justify-content: space-between; align-items: center;">
@@ -87,14 +90,14 @@
                                     <td class="col-md-2 text-center">
                                         <div class="text-center">
                                             @php
-                                                $persetujuanForUser = \App\Models\Persetujuan::where('kategori_id', $item->id)
-                                                ->where('user_id', Auth::id())
-                                                    ->where('kerjaAksi', 'update')
-                                                    ->where('namaTabel', 'Kategori')
-                                                    ->first();
-                                                $persetujuanIsiForm = $persetujuanForUser && $persetujuanForUser->kodePersetujuan !== null;
-                                                $persetujuanDisetujui = $persetujuanIsiForm && $persetujuanForUser->lagiProses == 1;
-                                                @endphp
+                                            $persetujuanForUser = \App\Models\Persetujuan::where('kategori_id', $item->id)
+                                            ->where('user_id', Auth::id())
+                                            ->where('kerjaAksi', 'update')
+                                            ->where('namaTabel', 'Kategori')
+                                            ->first();
+                                            $persetujuanIsiForm = $persetujuanForUser && $persetujuanForUser->kodePersetujuan !== null;
+                                            $persetujuanDisetujui = $persetujuanIsiForm && $persetujuanForUser->lagiProses == 1;
+                                            @endphp
 
                                             @if (!$persetujuanForUser)
                                             <a href="#" onclick="showConfirmModal('{{ url('kategori/' . $item->id . '/checkEdit') }}')" class="btn btn-primary btn-sm mx-2">
@@ -111,7 +114,7 @@
                                                 <i class="fas fa-edit"></i>
                                                 Edit
                                             </a>
-                                            @else 
+                                            @else
                                             <a href="#" onclick="showWaitModal()" class="btn btn-primary btn-sm mx-2">
                                                 <i class="fas fa-edit"></i>
                                                 Edit
@@ -249,10 +252,10 @@
         }
     </script>
     <script>
-        $('#modalArsipkan').on('show.bs.modal', function (event) {
+        $('#modalArsipkan').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget);
             var id = button.data('id');
-            var action = '{{ url('kategori/arsipkan') }}/' + id;
+            var action = '{{ url("/kategori/arsipkan/") }}/' + id;
             var modal = $(this);
             modal.find('#formArsipkan').attr('action', action);
         });

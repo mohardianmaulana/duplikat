@@ -33,82 +33,82 @@
                     <div class="my-3 p-3 bg-body shadow-sm"
                         style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
                         @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                         @endif
                         @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
                         @endif
                         {{-- <!-- TOMBOL TAMBAH DATA -->
                         <div class="pb-3" style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <a href="{{ 'kategori/create' }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus fa-xs"></i>
-                                    Tambah Harga
-                                </a>
-                            </div>
-                        </div> --}}
-
-                        <table id="myTable" class="table table-striped">
-                            <thead>
-                                <tr class="text-center">
-                                    <th class="col-md-1 text-center">No</th>
-                                    <th class="col-md-2 text-center">Nama Barang</th>
-                                    <th class="col-md-2 text-center">Supplier</th>
-                                    <th class="col-md-2 text-center">Harga Beli</th>
-                                    <th class="col-md-2 text-center">Harga Jual</th>
-                                    <th class="col-md-2 text-center">Tanggal Mulai</th>
-                                    <th class="col-md-2 text-center">Tanggal Selesai</th>
-                                    <th class="col-md-2 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($hargaBarang as $item)
-                                <tr class="text-center">
-                                    <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
-                                    <td class="col-md-2 text-center">{{ $item->nama_barang }}</td>
-                                    <td class="col-md-2 text-center">{{ $item->nama_supplier }}</td>
-                                    <td class="col-md-2 text-center">Rp. {{ number_format($item->harga_beli, 0, ',', '.') }}</td>
-                                    <td class="col-md-2 text-center">Rp. {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
-                                    <td class="col-md-2 text-center">{{ $item->formatted_tanggal_mulai }}</td>
-                                    <td class="col-md-2 text-center">{{ $item->formatted_tanggal_selesai }}</td>
-                                    <td class="col-md-2 text-center">
-                                        @if(!$item->isComplete)
-                                        <div class="text-center">
-                                            <a href='{{ url('harga/'.$item->id.'/edit') }}'
-                                                class="btn btn-primary btn-sm">
-                                                <i class="fas fa-edit"></i>
-                                                Edit
-                                            </a>
-                                        </div>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        {{-- {{ $kategori->withQueryString()->links() }} --}}
+                        <i class="fas fa-plus fa-xs"></i>
+                        Tambah Harga
+                        </a>
                     </div>
+                </div> --}}
 
-                </div>
-                <!-- /.container-fluid -->
-
+                <table id="myTable" class="table table-striped">
+                    <thead>
+                        <tr class="text-center">
+                            <th class="col-md-1 text-center">No</th>
+                            <th class="col-md-2 text-center">Nama Barang</th>
+                            <th class="col-md-2 text-center">Supplier</th>
+                            <th class="col-md-2 text-center">Harga Beli</th>
+                            <th class="col-md-2 text-center">Harga Jual</th>
+                            <th class="col-md-2 text-center">Tanggal Mulai</th>
+                            <th class="col-md-2 text-center">Tanggal Selesai</th>
+                            <th class="col-md-2 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($hargaBarang as $item)
+                        <tr class="text-center">
+                            <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
+                            <td class="col-md-2 text-center">{{ $item->nama_barang }}</td>
+                            <td class="col-md-2 text-center">{{ $item->nama_supplier }}</td>
+                            <td class="col-md-2 text-center">Rp. {{ number_format($item->harga_beli, 0, ',', '.') }}</td>
+                            <td class="col-md-2 text-center">Rp. {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                            <td class="col-md-2 text-center">{{ $item->formatted_tanggal_mulai }}</td>
+                            <td class="col-md-2 text-center">{{ $item->formatted_tanggal_selesai }}</td>
+                            <td class="col-md-2 text-center">
+                                @if(!$item->isComplete)
+                                <div class="text-center">
+                                    <a href='{{ url('harga/'.$item->id.'/edit') }}'
+                                        class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </a>
+                                </div>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                {{-- {{ $kategori->withQueryString()->links() }} --}}
             </div>
-            <!-- End of Main Content -->
-
-            <!-- Footer -->
-            @include('template.footer')
-            <!-- End of Footer -->
 
         </div>
-        <!-- End of Content Wrapper -->
+        <!-- /.container-fluid -->
+
+    </div>
+    <!-- End of Main Content -->
+
+    <!-- Footer -->
+    @include('template.footer')
+    <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
 
     </div>
     <!-- End of Page Wrapper -->

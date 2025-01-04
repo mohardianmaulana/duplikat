@@ -65,7 +65,7 @@ class PenjualanController extends Controller
 
     public function create(Request $request)
     {
-        $dataBarang = Session()->get('barang', []); // Ambil data barang dari sesi
+        $dataBarang = Session()->get('penjualan_barang', []); // Ambil data barang dari sesi
 
         // Ambil customer_id dari query parameter
         $customer_id = $request->query('customer_id');
@@ -100,59 +100,93 @@ class PenjualanController extends Controller
         ];
 
         // Simpan data ke sesi
-        $data = Session::get('barang', []); // Ambil data sesi jika ada
+        $data = Session::get('penjualan_barang', []); // Ambil data sesi jika ada
         $data[$request->id] = $barang; // Tambahkan atau update data barang berdasarkan ID
-        Session::put('barang', $data); // Simpan kembali ke sesi
+        Session::put('penjualan_barang', $data); // Simpan kembali ke sesi
 
         return response()->json(['message' => 'Barang berhasil ditambahkan ke sesi', 'data' => $data]);
     }
 
     public function hapusSesi(Request $request)
     {
-        $data = Session::get('barang', []);
+        $data = Session::get('penjualan_barang', []);
         unset($data[$request->id]); // Hapus barang berdasarkan ID
-        Session::put('barang', $data); // Update sesi
+        Session::put('penjualan_barang', $data); // Update sesi
 
         return response()->json(['message' => 'Barang berhasil dihapus dari sesi']);
     }
 
-
+    
+    
+    
     public function store(Request $request)
     {
         // Panggil method `storePenjualan` dari model
         $result = Penjualan::tambahPenjualan($request);
-
+        
         // Jika terjadi error validasi, kembalikan dengan error
         if ($result['status'] == 'error') {
             return redirect()->back()
-                ->withErrors($result['errors'])
-                ->withInput();
+            ->withErrors($result['errors'])
+            ->withInput();
         }
-
+        
         // Hapus data sesi setelah pembelian berhasil disimpan
-        Session::forget('barang'); // Menghapus semua data 'barang' di sesi
-
+        Session::forget('penjualan_barang'); // Menghapus semua data 'barang' di sesi
+        
         // Jika berhasil, kembalikan dengan pesan sukses
         return redirect()->to('penjualan')->with('success', 'Penjualan berhasil disimpan.');
     }
-
+    
     public function edit($id)
     {
         // Panggil method `getPenjualanForEdit` dari model
-        $penjualan = Penjualan::edit($id);
-
+        $data = Penjualan::edit($id);
+        
         // Jika terjadi error (penjualan tidak ditemukan atau lebih dari 1 bulan)
-        if ($penjualan['status'] == 'error') {
-            $route = isset($penjualan['redirect_route']) ? $penjualan['redirect_route'] : 'penjualan.index';
-            return redirect()->route($route)->with('error', $penjualan['message']);
+        if ($data['status'] == 'error') {
+            $route = isset($data['redirect_route']) ? $data['redirect_route'] : 'penjualan.index';
+            return redirect()->route($route)->with('error', $data['message']);
         }
-
-        // Ambil data penjualan dan barangs dari hasil
-        $penjualan = $penjualan['penjualan'];
-        $barangs = $penjualan['barangs'];
-
-        // Jika berhasil, arahkan ke view edit
-        return view('penjualan.edit', compact('penjualan', 'barangs'));
+        
+        // Kirimkan data ke view
+        return view('penjualan.edit', $data);
+    }
+    
+    
+    public function editTambahSesi(Request $request)
+    {
+        // Ambil data barang dari request
+        $barang = [
+            'id' => $request->id,
+            'nama' => $request->nama,
+            'harga' => $request->harga,
+        ];
+        
+        // Simpan data ke sesi
+        $data = Session::get('edit_penjualan_barang', []); // Ambil data sesi jika ada
+        $data[$request->id] = $barang; // Tambahkan atau update data barang berdasarkan ID
+        Session::put('edit_penjualan_barang', $data); // Simpan kembali ke sesi
+        
+        return response()->json(['message' => 'Barang berhasil ditambahkan ke sesi', 'data' => $data]);
+    }
+    
+    public function editHapusSesi(Request $request)
+    {
+        
+        $data = Session::get('edit_penjualan_barang', []);
+        unset($data[$request->id]); // Hapus barang berdasarkan ID
+        Session::put('edit_penjualan_barang', $data); // Update sesi
+        
+        return response()->json(['message' => 'Barang berhasil dihapus dari sesi']);
+    }
+    
+    public function hapusSemuaSesi()
+    {
+        // Hapus semua data sesi yang terkait
+        session()->forget('penjualan_barang'); // Ganti dengan nama sesi yang Anda gunakan
+        session()->forget('edit_penjualan_barang'); // Ganti dengan nama sesi yang Anda gunakan
+        return redirect()->route('penjualan');
     }
 
     public function update(Request $request, $id)

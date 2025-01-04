@@ -36,16 +36,16 @@
                         <div class="alert alert-danger">
                             <ul>
                                 @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
+                                <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
                         </div>
-                    @endif
-                    @if (session('success'))
+                        @endif
+                        @if (session('success'))
                         <div class="alert alert-success">
                             {{ session('success') }}
                         </div>
-                    @endif
+                        @endif
                         <table id="myTable" class="table table-striped">
                             <thead>
                                 <tr class="text-center">
@@ -81,9 +81,9 @@
                                             @else
                                             <a href="#" data-toggle="modal" data-target="#modalPersetujuan" onclick="showPersetujuan('{{ $item->kodePersetujuan }}')" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-eye"></i>
-                                            </a>                                                                                 
+                                            </a>
                                             @endif
-                        
+
                                             <a href="#" data-toggle="modal"
                                                 data-target="#modalDelete"
                                                 onclick="$('#modalDelete #formDelete').attr('action', '{{ url('persetujuan/' . $item->id) }}')"
@@ -167,33 +167,33 @@
     </div>
 
     <script>
-    function generateCode(id) {
-        fetch('/persetujuan/' + id + '/generateCode')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show the modal with the generated code
-                    showPersetujuan(data.kodePersetujuan);
-                    $('#modalPersetujuan').modal('show');
+        function generateCode(id) {
+            fetch('/persetujuan/' + id + '/generateCode')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show the modal with the generated code
+                        showPersetujuan(data.kodePersetujuan);
+                        $('#modalPersetujuan').modal('show');
 
-                    // Update the button to show the eye icon
-                    const button = document.querySelector(`a[data-id="${id}"]`);
-                    if (button) {
-                        button.outerHTML = `
+                        // Update the button to show the eye icon
+                        const button = document.querySelector(`a[data-id="${id}"]`);
+                        if (button) {
+                            button.outerHTML = `
                             <a href="#" data-toggle="modal" data-target="#modalPersetujuan" onclick="showPersetujuan('${data.kodePersetujuan}')" class="btn btn-primary btn-sm" data-id="${id}">
                                 <i class="fas fa-eye"></i>
                             </a>`;
+                        }
+                    } else {
+                        alert('Gagal menggenerate kode persetujuan.');
                     }
-                } else {
-                    alert('Gagal menggenerate kode persetujuan.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
 
-    function showPersetujuan(kode) {
-        document.getElementById('kodePersetujuan').textContent = kode;
-    }
+        function showPersetujuan(kode) {
+            document.getElementById('kodePersetujuan').textContent = kode;
+        }
     </script>
 </body>
 

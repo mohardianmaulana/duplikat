@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index(JumlahBarangChart $chart)
+    public function index(JumlahBarangChart $jumlahBarangChart)
     {
         // Get the start and end of the current month
         $startOfMonth = Carbon::now()->startOfMonth();
@@ -20,21 +20,25 @@ class DashboardController extends Controller
 
         // Calculate total sales revenue for the current month
         $totalPenjualan = DB::table('penjualan')
-                            ->whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
-                            ->sum('total_harga');
+            ->whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
+            ->sum('total_harga');
 
         // Calculate total purchase cost for the current month
         $totalPembelian = DB::table('pembelian')
-                            ->whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
-                            ->sum('total_harga');
+            ->whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
+            ->sum('total_harga');
 
         // Calculate the profit
         $keuntungan = $totalPenjualan - $totalPembelian;
         // Hitung jumlah total dari total_harga
-        $totalPembelianKeseluruhan = Pembelian::sum('total_harga');
-        $totalPenjualanKeseluruhan = Penjualan::sum('total_harga');
+        $totalPembelianBulanIni = Pembelian::whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
+                                        ->sum('total_harga');
+        $totalPenjualanBulanIni = Penjualan::whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
+                                        ->sum('total_harga');
         $barang = Barang::all();
-        return view('dashboard', compact('barang', 'totalPembelianKeseluruhan', 'totalPenjualanKeseluruhan', 'keuntungan'), ['chart' => $chart->build()]);
+        $donutChart = $jumlahBarangChart->buildDonutChart(); // Menampilkan chart donat
+        $barChart = $jumlahBarangChart->buildBarChart();
+        return view('dashboard', compact('barang', 'totalPembelianBulanIni', 'totalPenjualanBulanIni', 'keuntungan', 'donutChart', 'barChart'));
     }
     public function kode()
     {
@@ -49,13 +53,13 @@ class DashboardController extends Controller
 
         // Calculate total sales revenue for the current month
         $totalPenjualan = DB::table('penjualan')
-                            ->whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
-                            ->sum('total_harga');
+            ->whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
+            ->sum('total_harga');
 
         // Calculate total purchase cost for the current month
         $totalPembelian = DB::table('pembelian')
-                            ->whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
-                            ->sum('total_harga');
+            ->whereBetween('tanggal_transaksi', [$startOfMonth, $endOfMonth])
+            ->sum('total_harga');
 
         // Calculate the profit
         $keuntungan = $totalPenjualan - $totalPembelian;

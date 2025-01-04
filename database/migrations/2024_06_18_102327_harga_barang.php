@@ -16,7 +16,7 @@ return new class extends Migration
             $table-> unsignedBigInteger('barang_id');
             $table-> unsignedBigInteger('supplier_id');
             $table-> integer('harga_beli');
-            $table-> integer('harga_jual');
+            $table-> integer('harga_jual')->nullable();
             $table-> date('tanggal_mulai');
             $table-> date('tanggal_selesai')->nullable();
             $table->timestamps();

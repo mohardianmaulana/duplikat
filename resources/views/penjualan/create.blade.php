@@ -6,6 +6,13 @@
     @include('template.header')
 </head>
 
+<style>
+    .required::after {
+        content: " *";
+        color: red;
+    }
+</style>
+
 <body id="page-top">
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -34,21 +41,20 @@
                         style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius:15px;">
 
                         @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                         @endif
 
                         <form method="POST" action="{{ url('penjualan') }}" id="penjualanForm">
                             @csrf
                             <input type="hidden" name="customer_id" value="{{ $customer->id }}">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <a href='{{ url('penjualan') }}' class="btn btn-secondary btn-sm">
-                                    < Kembali</a>
+                            <a href="{{ route('penjualan.kembali') }}" class="btn btn-secondary btn-sm" id="kembaliBtn"> < Kembali</a>
                                         <div>Tanggal Transaksi : <span id="tanggalTransaksi"></span></div>
                             </div>
                             <div>
@@ -85,32 +91,32 @@
                                         <th class="col-md-1 text-center">No</th>
                                         <th class="col-md-3 text-center">Nama Barang</th>
                                         <th class="col-md-2 text-center">Harga</th>
-                                        <th class="col-md-2 text-center">Jumlah</th>
+                                        <th class="col-md-2 text-center required">Jumlah</th>
                                         <th class="col-md-2 text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($dataBarang as $index => $item)
-                                        <tr class="text-center" data-id="{{ $item['id'] }}">
-                                            <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
-                                            <td class="col-md-3 text-center">{{ $item['nama'] }}</td>
-                                            <td class="col-md-2 text-center">
-                                                Rp. {{ number_format($item['harga'], 0, ',', '.') }}
-                                                <input type="hidden" class="harga-barang" name="harga_jual[]"
-                                                    value="{{ $item['harga'] }}">
-                                                <input type="hidden" name="barang_id[]" value="{{ $item['id'] }}">
-                                            </td>
-                                            <td class="col-md-2 text-center">
-                                                <input type="number" class="form-control jumlah-barang" name="jumlah[]"
-                                                    value="1" oninput="hitungTotal()">
-                                            </td>
-                                            <td class="col-md-2 text-center">
-                                                <button type="button" class="btn btn-danger btn-sm deleteBarangBtn"
-                                                    data-id="{{ $item['id'] }}">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
-                                            </td>
-                                        </tr>
+                                    <tr class="text-center" data-id="{{ $item['id'] }}">
+                                        <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
+                                        <td class="col-md-3 text-center">{{ $item['nama'] }}</td>
+                                        <td class="col-md-2 text-center">
+                                            Rp. {{ number_format($item['harga'], 0, ',', '.') }}
+                                            <input type="hidden" class="harga-barang" name="harga_jual[]"
+                                                value="{{ $item['harga'] }}">
+                                            <input type="hidden" name="barang_id[]" value="{{ $item['id'] }}">
+                                        </td>
+                                        <td class="col-md-2 text-center">
+                                            <input type="number" class="form-control jumlah-barang" name="jumlah[]"
+                                                value="1" oninput="hitungTotal()">
+                                        </td>
+                                        <td class="col-md-2 text-center">
+                                            <button type="button" class="btn btn-danger btn-sm deleteBarangBtn"
+                                                data-id="{{ $item['id'] }}">
+                                                <i class="fas fa-trash"></i> Hapus
+                                            </button>
+                                        </td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -125,7 +131,7 @@
                         </div>
                         <div class="col-md-6">
                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                <label for="bayar" style="width: 80px; margin-right: 10px;">Bayar</label>
+                                <label for="bayar" class='required' style="width: 80px; margin-right: 10px;">Bayar</label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp.</span>
                                     <input type="number" class="form-control" id="bayar" name="bayar"
@@ -174,16 +180,59 @@
 
     <script>
         $(document).ready(function() {
+            // Panggil fungsi hitungTotal saat halaman pertama kali dibuka
+            hitungTotal();
             if (sessionStorage.getItem('reloadAndCalculate') === 'true') {
                 // Panggil fungsi hitungTotal untuk menghitung total harga setelah reload
                 hitungTotal();
-                
+
                 // Hapus flag reloadAndCalculate setelah dipanggil
                 sessionStorage.removeItem('reloadAndCalculate');
 
                 // Buka modal QR Scan secara otomatis setelah halaman reload
                 $('#qrScanModal').modal('show');
+            } else if (sessionStorage.getItem('reload') === 'true') {
+                    // Panggil fungsi hitungTotal untuk menghitung total harga setelah reload
+                    hitungTotal();
+
+                    // Hapus flag reloadAndCalculate setelah dipanggil
+                    sessionStorage.removeItem('reload');
+
+                    // Buka modal QR Scan secara otomatis setelah halaman reload
+                    $('#modalBarang').modal('show');
             }
+
+            // Tangkap perubahan pada input jumlah barang dan simpan ke sessionStorage
+            $(document).on('input', '.jumlah-barang', function() {
+                    let barangId = $(this).closest('tr').data('id');
+                    let jumlah = $(this).val();
+                    // Simpan jumlah barang ke sessionStorage dengan key yang unik berdasarkan barangId
+                    sessionStorage.setItem('jumlah_' + barangId, jumlah);
+                });
+
+                // Memulihkan nilai jumlah dari sessionStorage setelah halaman dimuat ulang
+                window.addEventListener('load', function() {
+                    // Periksa setiap elemen jumlah barang dan perbarui nilai berdasarkan sessionStorage
+                    $('.jumlah-barang').each(function() {
+                        let barangId = $(this).closest('tr').data('id');
+                        // Ambil jumlah barang yang tersimpan di sessionStorage
+                        let savedJumlah = sessionStorage.getItem('jumlah_' + barangId);
+                        if (savedJumlah) {
+                            $(this).val(savedJumlah); // Terapkan nilai jumlah yang disimpan
+                        } else {
+                            $(this).val(1); // Jika tidak ada nilai yang disimpan, set ke 1 sebagai default
+                        }
+                    });
+
+                    // Panggil hitungTotal setelah memulihkan nilai jumlah
+                    hitungTotal();
+                });
+
+            // Tangkap event klik pada tombol kembali
+            document.getElementById('kembaliBtn').addEventListener('click', function(e) {
+                // Hapus semua data dari sessionStorage
+                sessionStorage.clear();
+            });
 
             // Saat memilih barang dari modal
             $(document).on('click', '.pilihBarangBtn', function() {
@@ -203,7 +252,9 @@
                     },
                     success: function(response) {
                         console.log(response.message);
-                        addBarangToTable(id, nama, harga); // Tampilkan barang di tabel
+                        // addBarangToTable(id, nama, harga); // Tampilkan barang di tabel
+                        sessionStorage.setItem('reload', 'true'); // Set flag reloadPage
+                        location.reload();
                     },
                     error: function(xhr) {
                         console.error(xhr.responseText);
@@ -293,14 +344,23 @@
             });
 
             $(document).on('click', '.deleteBarangBtn', function() {
-                const id = $(this).data('id');
+                const barangId = $(this).data('id');
+
+                    // Hapus data jumlah barang dari sessionStorage
+                    sessionStorage.removeItem('jumlah_' + barangId);
+
+                    // Hapus baris barang dari tabel
+                    $(this).closest('tr').remove();
+
+                    // Panggil fungsi hitungTotal untuk memperbarui total harga setelah barang dihapus
+                    hitungTotal();
 
                 // Hapus barang dari sesi melalui AJAX
                 $.ajax({
                     url: '/penjualan/hapus-sesi',
                     method: 'POST',
                     data: {
-                        id: id,
+                        id: barangId,
                         _token: '{{ csrf_token() }}',
                     },
                     success: function(response) {
@@ -328,9 +388,9 @@
                 let total = 0;
                 $('#selectedBarangTable tbody tr').each(function() {
                     const harga = parseFloat($(this).find('.harga-barang').val()) ||
-                    0; // Get the harga value
+                        0; // Get the harga value
                     const jumlah = parseInt($(this).find('.jumlah-barang').val()) ||
-                    0; // Get the jumlah value
+                        0; // Get the jumlah value
                     total += harga * jumlah; // Accumulate total
                 });
                 $('#totalHarga').text('Rp ' + total.toLocaleString('id-ID')); // Format total for display
@@ -355,7 +415,7 @@
             function hitungKembali() {
                 // Ambil total harga dengan menghapus "Rp. " dan karakter non-numeric
                 const total = parseFloat($('#totalHarga').text().replace(/Rp\.|\./g, "").replace(/[^0-9.-]+/g,
-                "")); // Hapus "Rp. " dan format lainnya
+                    "")); // Hapus "Rp. " dan format lainnya
                 const bayar = parseFloat($('#bayar').val()) || 0; // Parse nilai input untuk bayar
 
                 // Periksa jika nilai bayar valid
@@ -458,47 +518,47 @@
                             if (code) {
                                 // Kirim data QR ke server untuk mencari barang
                                 fetch('/cek_qr', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    },
-                                    body: JSON.stringify({
-                                        id_qr: code.data
-                                    }),
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.exists) {
-                                        console.log(data.exists);
-                                        // Tampilkan nama barang yang berhasil dipindai
-                                        const notificationText = `Barang ${data.nama} berhasil ditambahkan!`;
-                                        $('#scanNotification').text(notificationText); // Update teks notifikasi
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        },
+                                        body: JSON.stringify({
+                                            id_qr: code.data
+                                        }),
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.exists) {
+                                            console.log(data.exists);
+                                            // Tampilkan nama barang yang berhasil dipindai
+                                            const notificationText = `Barang ${data.nama} berhasil ditambahkan!`;
+                                            $('#scanNotification').text(notificationText); // Update teks notifikasi
 
-                                        // Simpan barang ke sesi
-                                        $.ajax({
-                                            url: '/penjualan/tambah-sesi',
-                                            method: 'POST',
-                                            data: {
-                                                id: data.id,
-                                                nama: data.nama,
-                                                harga: data.harga,
-                                                _token: '{{ csrf_token() }}',
-                                            },
-                                            success: function(response) {
-                                                console.log(response.message);
-                                                // Tandai bahwa halaman perlu di-reload dan fungsi hitungTotal akan dipanggil
-                                                sessionStorage.setItem('reloadAndCalculate', 'true'); // Set flag reloadPage
-                                                location.reload();
-                                            },
-                                            error: function(xhr) {
-                                                console.error(xhr.responseText);
-                                            },
-                                        });
-                                    } else {
-                                        alert('Barang tidak ditemukan!');
-                                    }
-                                });
+                                            // Simpan barang ke sesi
+                                            $.ajax({
+                                                url: '/penjualan/tambah-sesi',
+                                                method: 'POST',
+                                                data: {
+                                                    id: data.id,
+                                                    nama: data.nama,
+                                                    harga: data.harga,
+                                                    _token: '{{ csrf_token() }}',
+                                                },
+                                                success: function(response) {
+                                                    console.log(response.message);
+                                                    // Tandai bahwa halaman perlu di-reload dan fungsi hitungTotal akan dipanggil
+                                                    sessionStorage.setItem('reloadAndCalculate', 'true'); // Set flag reloadPage
+                                                    location.reload();
+                                                },
+                                                error: function(xhr) {
+                                                    console.error(xhr.responseText);
+                                                },
+                                            });
+                                        } else {
+                                            alert('Barang tidak ditemukan!');
+                                        }
+                                    });
                             } else {
                                 // Jika QR Code tidak terdeteksi, teruskan untuk scan
                                 requestAnimationFrame(scanQRCode);
@@ -507,15 +567,15 @@
 
                         // Fungsi untuk menangani logika setelah halaman di-reload
                         $(document).ready(function() {
-                                // Periksa apakah ada flag reloadAndCalculate di sessionStorage
-                                if (sessionStorage.getItem('reloadAndCalculate') === 'true') {
-                                    // Panggil fungsi hitungTotal untuk menghitung total harga setelah reload
-                                    hitungTotal();
-                                    
-                                    // Hapus flag reloadAndCalculate setelah dipanggil
-                                    sessionStorage.removeItem('reloadAndCalculate');
-                                }
-                            });
+                            // Periksa apakah ada flag reloadAndCalculate di sessionStorage
+                            if (sessionStorage.getItem('reloadAndCalculate') === 'true') {
+                                // Panggil fungsi hitungTotal untuk menghitung total harga setelah reload
+                                hitungTotal();
+
+                                // Hapus flag reloadAndCalculate setelah dipanggil
+                                sessionStorage.removeItem('reloadAndCalculate');
+                            }
+                        });
                     </script>
                 </div>
                 {{-- <div class="modal-footer">
@@ -549,25 +609,25 @@
                         </thead>
                         <tbody>
                             @foreach ($barang as $item)
-                                <tr class="text-center">
-                                    <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
-                                    <td class="col-md-3 text-center">{{ $item->nama }}</td>
-                                    <td class="col-md-2 text-center">{{ $item->harga_jual }}
-                                        {{-- @if (isset($rataRataHargaBeli[$item->id]))
+                            <tr class="text-center">
+                                <td class="col-md-1 text-center">{{ $loop->iteration }}</td>
+                                <td class="col-md-3 text-center">{{ $item->nama }}</td>
+                                <td class="col-md-2 text-center"> Rp. {{ number_format($item->harga_jual, 0, ',', '.') }}
+                                    {{-- @if (isset($rataRataHargaBeli[$item->id]))
                                         Rp. {{ number_format($rataRataHargaBeli[$item->id], 0, ',', '.') }}
                                     @else
-                                        -
+                                    -
                                     @endif --}}
-                                    </td>
-                                    <td class="col-md-2 text-center">{{ $item->jumlah }}</td>
-                                    <td class="col-md-2 text-center">
-                                        <button type="button" class="btn btn-primary btn-sm pilihBarangBtn"
-                                            data-id="{{ $item->id }}" data-nama="{{ $item->nama }}"
-                                            data-harga="{{ $item->harga_jual }}" data-jumlah="{{ $item->jumlah }}">
-                                            <i class="fas fa-check-square"></i> Pilih
-                                        </button>
-                                    </td>
-                                </tr>
+                                </td>
+                                <td class="col-md-2 text-center">{{ $item->jumlah }}</td>
+                                <td class="col-md-2 text-center">
+                                    <button type="button" class="btn btn-primary btn-sm pilihBarangBtn"
+                                        data-id="{{ $item->id }}" data-nama="{{ $item->nama }}"
+                                        data-harga="{{ $item->harga_jual }}" data-jumlah="{{ $item->jumlah }}">
+                                        <i class="fas fa-check-square"></i> Pilih
+                                    </button>
+                                </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>
